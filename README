@@ -1,0 +1,4 @@
+To start a new project:
+1. Clone this repository
+2. Launch Android Studio
+3. Import new project from <repository_location>/build.gradle
