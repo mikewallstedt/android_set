@@ -5,15 +5,15 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.View;
 
 public class CardPickerFragment extends DialogFragment {
 	public static final String EXTRA_VIEW_ID = "com.example.setsolver.view_id";
-	private int mViewId;
-	
-	public static CardPickerFragment newInstance(int viewId) {
+
+    public static CardPickerFragment newInstance(int viewId) {
 		Bundle args = new Bundle();
 		args.putInt(EXTRA_VIEW_ID, viewId);
 		
@@ -39,13 +39,14 @@ public class CardPickerFragment extends DialogFragment {
 			}
 		});
 	}
-	
+
+    @NonNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		mViewId = getArguments().getInt(EXTRA_VIEW_ID);
+        int viewId = getArguments().getInt(EXTRA_VIEW_ID);
 		View v = getActivity().getLayoutInflater()
-				.inflate(mViewId, null);
-		switch (mViewId) {
+				.inflate(viewId, null);
+		switch (viewId) {
 		case R.layout.dialog_d1:
 			setOnClickCallback(v, R.id.d1ge, new Card(Card.Shape.DIAMOND, Card.Count.ONE, Card.Color.GREEN, Card.Fill.EMPTY));
 			setOnClickCallback(v, R.id.d1gh, new Card(Card.Shape.DIAMOND, Card.Count.ONE, Card.Color.GREEN, Card.Fill.HALF));

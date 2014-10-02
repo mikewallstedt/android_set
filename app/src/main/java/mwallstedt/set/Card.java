@@ -118,19 +118,19 @@ public class Card implements Serializable {
 	private static final String TAG = Card.class.getCanonicalName();
 
 	public static enum Shape {
-		OVAL, DIAMOND, SQUIGGLE;
+		OVAL, DIAMOND, SQUIGGLE
 	}
 
 	public static enum Count {
-		ONE, TWO, THREE;
-	}
+		ONE, TWO, THREE
+    }
 	
 	public static enum Color {
-		GREEN, RED, PURPLE;
+		GREEN, RED, PURPLE
 	}
 	
 	public static enum Fill {
-		FULL, HALF, EMPTY;
+		FULL, HALF, EMPTY
 	}
 	
 	private final Shape mShape;
@@ -144,35 +144,9 @@ public class Card implements Serializable {
 		mColor = color;
 		mFill = fill;
 	}
-
-	public Shape getShape() {
-		return mShape;
-	}
-
-	public Count getCount() {
-		return mCount;
-	}
-
-	public Color getColor() {
-		return mColor;
-	}
-
-	public Fill getFill() {
-		return mFill;
-	}
 	
 	public boolean isBlank() {
-		if (mShape == null) {
-			return true;
-		} else if (mCount == null) {
-			return true;
-		} else if (mColor == null) {
-			return true;
-		} else if (mFill == null) {
-			return true;
-		} else {
-			return false;
-		}
+        return ((mShape == null) || (mColor == null) || (mCount == null) || (mFill == null));
 	}
 	
 	public int getDrawableId() {
