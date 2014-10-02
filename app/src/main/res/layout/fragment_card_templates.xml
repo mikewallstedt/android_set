@@ -1,0 +1,78 @@
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_gravity="center_horizontal"
+    android:gravity="center_horizontal"
+    tools:context="com.example.setsolver.MainActivity" >
+
+    <TableRow
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal">
+        <ImageView
+            android:id="@+id/o1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/example_card_description"
+            android:src="@drawable/o1" />
+        <ImageView
+            android:id="@+id/o2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/example_card_description"
+            android:src="@drawable/o2" />
+        <ImageView
+            android:id="@+id/o3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/example_card_description"
+            android:src="@drawable/o3" />
+        </TableRow>
+
+    <TableRow
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal">
+        <ImageView
+            android:id="@+id/d1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/example_card_description"
+            android:src="@drawable/d1" />
+        <ImageView
+            android:id="@+id/d2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/example_card_description"
+            android:src="@drawable/d2" />
+        <ImageView
+            android:id="@+id/d3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/example_card_description"
+            android:src="@drawable/d3" />
+    </TableRow>
+
+    <TableRow
+        android:layout_gravity="center_horizontal"
+        android:gravity="center_horizontal">
+		<ImageView
+            android:id="@+id/s1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/example_card_description"
+            android:src="@drawable/s1" />
+        <ImageView
+            android:id="@+id/s2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/example_card_description"
+            android:src="@drawable/s2" />
+        <ImageView
+            android:id="@+id/s3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:contentDescription="@string/example_card_description"
+            android:src="@drawable/s3" />
+    </TableRow>
+
+</TableLayout>

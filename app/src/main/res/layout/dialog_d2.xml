@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center" >
+    
+    <LinearLayout
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal" >
+		    <ImageView
+		        android:id="@+id/d2gf"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/d2gf"
+		        android:contentDescription="@string/example_card_description" />
+		    <ImageView
+		        android:id="@+id/d2gh"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/d2gh"
+		        android:contentDescription="@string/example_card_description" />
+		    <ImageView
+		        android:id="@+id/d2ge"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/d2ge"
+		        android:contentDescription="@string/example_card_description" />
+		</LinearLayout>
+		
+	    <LinearLayout 
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal">
+	        <ImageView
+		        android:id="@+id/d2rf"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/d2rf"
+		        android:contentDescription="@string/example_card_description" />
+		    <ImageView
+		        android:id="@+id/d2rh"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/d2rh"
+		        android:contentDescription="@string/example_card_description" />
+			<ImageView
+			    android:id="@+id/d2re"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/d2re"
+		        android:contentDescription="@string/example_card_description" />
+	    </LinearLayout>
+	    
+	    <LinearLayout 
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:orientation="horizontal">
+			<ImageView
+			    android:id="@+id/d2pf"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/d2pf"
+		        android:contentDescription="@string/example_card_description" />
+			<ImageView
+			    android:id="@+id/d2ph"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/d2ph"
+		        android:contentDescription="@string/example_card_description" />
+			<ImageView
+			    android:id="@+id/d2pe"
+		        android:layout_width="wrap_content"
+		        android:layout_height="wrap_content"
+		        android:src="@drawable/d2pe"
+		        android:contentDescription="@string/example_card_description" />
+		</LinearLayout>
+    
+
+</LinearLayout>
