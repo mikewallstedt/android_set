@@ -13,23 +13,29 @@ import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class HandFragment extends Fragment {
 	private static final String TAG = HandFragment.class.getCanonicalName();
 
+    private static final String SAVED_TRIAD_COUNT = "SAVED_TRIAD_COUNT";
+    private static final int TRIAD_SIZE = 3;
+    private static final int DEFAULT_NUMBER_OF_TRIADS = 4;
+
 	private class Slot {
 		private final ImageView mView;
 		private Card mCard;
-		
+
 		private Slot(ImageView view, final int x, final int y) {
 			mView = view;
 			view.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
-					mSlots[mY][mX].unhighlight();
+					mSlots.get(mX)[mY].unhighlight();
 					highlight();
 					mX = x;
 					mY = y;
@@ -37,76 +43,90 @@ public class HandFragment extends Fragment {
 			});
 			mCard = new Card(null,null,null,null);
 		}
-		
+
 		private void setCard(Card card) {
 			mCard = card;
 			Resources resources = getActivity().getResources();
     		Drawable drawable = resources.getDrawable(card.getDrawableId());
     		mView.setImageDrawable(drawable);
 		}
-		
+
 		private Card getCard() {
 			return mCard;
 		}
-		
+
 		private void highlight() {
 			Resources resources = getActivity().getResources();
     		Drawable drawable = resources.getDrawable(mCard.getHighlightedDrawableId());
     		mView.setImageDrawable(drawable);
 		}
-		
+
 		private void unhighlight() {
 			Resources resources = getActivity().getResources();
     		Drawable drawable = resources.getDrawable(mCard.getDrawableId());
     		mView.setImageDrawable(drawable);
 		}
 	}
-	
-	private Slot mSlots[][];
+
+	private List<Slot[]> mSlots;
 	private int mX, mY;
 	private int mXDim, mYDim;
-	
+
 	public static final String EXTRA_CARD = "com.example.setsolver.EXTRA_CARD";
-	
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mXDim = 4;
-        mYDim = 3;
+        if (savedInstanceState != null) {
+            mXDim = savedInstanceState.getInt(SAVED_TRIAD_COUNT);
+        } else {
+            mXDim = DEFAULT_NUMBER_OF_TRIADS;
+        }
+        Log.i(TAG, "Num triads: " + mXDim);
+        mYDim = TRIAD_SIZE;
         Log.i(TAG, "onCreate");
     }
-    
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent,
     		Bundle savedInstanceState) {
     	super.onCreateView(inflater, parent, savedInstanceState);
     	View v = inflater.inflate(R.layout.fragment_hand, parent, false);
+        final LinearLayout trioHolderView = (LinearLayout) v.findViewById(R.id.trio_holder);
     	mX = 0;
     	mY = 0;
-    	mSlots = new Slot[mYDim][mXDim];
-    	mSlots[0][0] = new Slot((ImageView) v.findViewById(R.id.h00), 0, 0);
-    	mSlots[0][1] = new Slot((ImageView) v.findViewById(R.id.h01), 1, 0);
-    	mSlots[0][2] = new Slot((ImageView) v.findViewById(R.id.h02), 2, 0);
-    	mSlots[0][3] = new Slot((ImageView) v.findViewById(R.id.h03), 3, 0);
-    	mSlots[1][0] = new Slot((ImageView) v.findViewById(R.id.h10), 0, 1);
-    	mSlots[1][1] = new Slot((ImageView) v.findViewById(R.id.h11), 1, 1);
-    	mSlots[1][2] = new Slot((ImageView) v.findViewById(R.id.h12), 2, 1);
-    	mSlots[1][3] = new Slot((ImageView) v.findViewById(R.id.h13), 3, 1);
-    	mSlots[2][0] = new Slot((ImageView) v.findViewById(R.id.h20), 0, 2);
-    	mSlots[2][1] = new Slot((ImageView) v.findViewById(R.id.h21), 1, 2);
-    	mSlots[2][2] = new Slot((ImageView) v.findViewById(R.id.h22), 2, 2);
-    	mSlots[2][3] = new Slot((ImageView) v.findViewById(R.id.h23), 3, 2);
-    	
+        mSlots = new ArrayList<Slot[]>();
+        for (int x = 0; x < mXDim; x++) {
+            Slot[] slots = new Slot[TRIAD_SIZE];
+            LinearLayout trioView = new LinearLayout(getActivity());
+            trioView.setOrientation(LinearLayout.VERTICAL);
+            for (int y = 0; y < mYDim; y++) {
+                ImageView imageView = new ImageView(getActivity());
+                slots[y] = new Slot(imageView, x, y);
+                trioView.addView(imageView);
+            }
+            mSlots.add(slots);
+            trioHolderView.addView(trioView);
+        }
+
     	if (savedInstanceState != null) {
             List<Card> cards = ((MainActivity)getActivity()).mSelected;
             for (int y = 0; y < mYDim; y++) {
         		for (int x = 0; x < mXDim; x++) {
-        			 mSlots[y][x].setCard(cards.get((y*mXDim) + x));
+                    mSlots.get(x)[y].setCard(cards.get((y * mXDim) + x));
         		}
         	}
+        } else {
+            for (int y = 0; y < mYDim; y++) {
+                for (int x = 0; x < mXDim; x++) {
+                    mSlots.get(x)[y].setCard(new Card(null, null, null, null));
+                }
+            }
         }
-    	
-		mSlots[0][0].highlight();
+
+        if (mXDim > 0) {
+            mSlots.get(0)[0].highlight();
+        }
 		Button matchButton = (Button) v.findViewById(R.id.match_button);
 		matchButton.setOnClickListener(new OnClickListener() {
 			@Override
@@ -114,9 +134,51 @@ public class HandFragment extends Fragment {
 				findSet();
 			}
 		});
+        Button newTriadButton = (Button) v.findViewById(R.id.new_triad_button);
+        newTriadButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int x = mXDim;
+                mXDim++;
+                Slot[] slots = new Slot[TRIAD_SIZE];
+                LinearLayout trioView = new LinearLayout(getActivity());
+                trioView.setOrientation(LinearLayout.VERTICAL);
+                for (int y = 0; y < mYDim; y++) {
+                    ImageView imageView = new ImageView(getActivity());
+                    slots[y] = new Slot(imageView, x, y);
+                    trioView.addView(imageView);
+                    slots[y].setCard(new Card(null,null,null,null));
+                }
+                mSlots.add(slots);
+                trioHolderView.addView(trioView);
+                mSlots.get(mX)[mY].unhighlight();
+                mX = 0;
+                mY = 0;
+                mSlots.get(0)[0].highlight();
+            }
+        });
+        Button deleteTriadButton = (Button) v.findViewById(R.id.delete_triad_button);
+        deleteTriadButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mSlots.get(mX)[mY].unhighlight();
+                int x = mSlots.size() - 1;
+                if (x < 0) {
+                    return;
+                }
+                mXDim--;
+                mSlots.remove(x);
+                trioHolderView.removeViewAt(x + 1);
+                if (x >= 1) {
+                    mX = 0;
+                    mY = 0;
+                    mSlots.get(0)[0].highlight();
+                }
+            }
+        });
         return v;
     }
-    
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
     	if (resultCode != Activity.RESULT_OK) {
@@ -130,9 +192,11 @@ public class HandFragment extends Fragment {
     	if (requestCode == CardTemplatesFragment.PICK_CARD_CODE) {
     		Log.i(TAG, "PICK_CARD_CODE is present");
     		Card card = (Card) data.getSerializableExtra(EXTRA_CARD);
-            ((MainActivity)getActivity()).mSelected.add(card);
-            Log.i(TAG, "Card = " + card);
-    		mSlots[mY][mX].setCard(card);
+    		Log.i(TAG, "Card = " + card);
+            if (mXDim < 1) {
+                return;
+            }
+            mSlots.get(mX)[mY].setCard(card);
             ((MainActivity)getActivity()).mSelected.add(card);
     		mX += 1;
     		if (mX >= mXDim) {
@@ -142,33 +206,44 @@ public class HandFragment extends Fragment {
     		if (mY >= mYDim) {
     			mY = 0;
     		}
-    		mSlots[mY][mX].highlight();
+            mSlots.get(mX)[mY].highlight();
     	} else {
     		Log.i(TAG, "PICK_CARD_CODE missing");
     	}
     }
-    
+
+    @Override
+    public void onSaveInstanceState(Bundle savedInstanceState) {
+    	Card[] cards = new Card[mYDim * mXDim];
+    	for (int y = 0; y < mYDim; y++) {
+    		for (int x = 0; x < mXDim; x++) {
+                cards[(y*mXDim) + x] = mSlots.get(x)[y].getCard();
+    		}
+    	}
+        savedInstanceState.putInt(SAVED_TRIAD_COUNT, mXDim);
+    }
+
     private void findSet() {
     	for (int first = 0; first < (mXDim * mYDim); first++) {
     		int firstX = first % mXDim;
     		int firstY = first / mXDim;
-    		Card firstCard = mSlots[firstY][firstX].getCard();
+            Card firstCard = mSlots.get(firstX)[firstY].getCard();
     		if ((firstCard == null) || firstCard.isBlank()) {
     			continue;
     		}
     		for (int second = first + 1; second < (mXDim * mYDim); second++) {
     			int secondX = second % mXDim;
     			int secondY = second / mXDim;
-    			Card secondCard = mSlots[secondY][secondX].getCard();
+                Card secondCard = mSlots.get(secondX)[secondY].getCard();
     			if ((secondCard == null) || secondCard.isBlank()) {
     				continue;
     			}
-    			Card thirdCard = firstCard.getCompleter(secondCard);
+                Card thirdCard = firstCard.getCompleter(secondCard);
     			Log.i(TAG, "first=" + first + ",second=" + second + "," + thirdCard);
     			for (int third = second + 1; third < (mXDim * mYDim); third++) {
     				int thirdX = third % mXDim;
     				int thirdY = third / mXDim;
-    				if (thirdCard.equals(mSlots[thirdY][thirdX].getCard())) {
+                    if (thirdCard.equals(mSlots.get(thirdX)[thirdY].getCard())) {
     					String message = first + "," + second + "," + third;
     					Toast toast = Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT);
     					toast.show();

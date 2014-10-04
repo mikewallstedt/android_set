@@ -5,6 +5,7 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.view.View;
@@ -15,11 +16,8 @@ import java.util.Map;
 
 public class CardPickerFragment extends DialogFragment {
 	public static final String EXTRA_VIEW_ID = "com.example.setsolver.view_id";
-	public static final String EXTRA_SELECTED = "com.example.setsolver.selected";
 
-    private int mViewId;
-
-	public static CardPickerFragment newInstance(int viewId) {
+    public static CardPickerFragment newInstance(int viewId) {
 		Bundle args = new Bundle();
 		args.putInt(EXTRA_VIEW_ID, viewId);
 
@@ -45,15 +43,15 @@ public class CardPickerFragment extends DialogFragment {
 			}
 		});
 	}
-	
+
+    @NonNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
-		mViewId = getArguments().getInt(EXTRA_VIEW_ID);
-        View v = getActivity().getLayoutInflater()
-				.inflate(mViewId, null);
-		Map<Integer, Card> viewToCard = new HashMap<Integer, Card>();
-        
-        switch (mViewId) {
+        int viewId = getArguments().getInt(EXTRA_VIEW_ID);
+		View v = getActivity().getLayoutInflater()
+				.inflate(viewId, null);
+        Map<Integer, Card> viewToCard = new HashMap<Integer, Card>();
+		switch (viewId) {
 		case R.layout.dialog_d1:
 			viewToCard.put(R.id.d1ge, new Card(Card.Shape.DIAMOND, Card.Count.ONE, Card.Color.GREEN, Card.Fill.EMPTY));
 			viewToCard.put(R.id.d1gh, new Card(Card.Shape.DIAMOND, Card.Count.ONE, Card.Color.GREEN, Card.Fill.HALF));
@@ -156,13 +154,13 @@ public class CardPickerFragment extends DialogFragment {
 		}
 
         List<Card> selected = ((MainActivity)getActivity()).mSelected;
-        for (Integer viewId : viewToCard.keySet()) {
-            Card card = viewToCard.get(viewId);
+        for (Integer cardViewId : viewToCard.keySet()) {
+            Card card = viewToCard.get(cardViewId);
             if (selected.contains(card)) {
-                v.findViewById(viewId).setAlpha(0);
+                v.findViewById(cardViewId).setAlpha(0);
             } else {
-                v.findViewById(viewId).setAlpha(1);
-                setOnClickCallback(v, viewId, card);
+                v.findViewById(cardViewId).setAlpha(1);
+                setOnClickCallback(v, cardViewId, card);
             }
         }
 
