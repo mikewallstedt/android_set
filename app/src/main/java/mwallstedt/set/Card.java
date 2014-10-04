@@ -132,7 +132,9 @@ public class Card implements Serializable {
 	public static enum Fill {
 		FULL, HALF, EMPTY
 	}
-	
+
+    public static final Card BLANK_CARD = new Card(null, null, null, null);
+
 	private final Shape mShape;
 	private final Count mCount;
 	private final Color mColor;
@@ -174,21 +176,13 @@ public class Card implements Serializable {
 
     @Override
 	public boolean equals(Object o) {
-		Log.i(TAG, "Calling Card.equals");
 		if (o == null) {
 			return false;
 		}
-		Log.i(TAG, "Passed the null test");
 		if (!(o instanceof Card)) {
-			Log.i(TAG, "Not a Card");
 			return false;
 		}
-		Log.i(TAG, "Passed the instaceof test");
 		Card other = (Card) o;
-		if (isBlank()) {
-			return other.isBlank();
-		}
-		Log.i(TAG, "Comparing " + this + " with " + other);
 		return (mShape == other.mShape) &&
 				(mCount == other.mCount) &&
 				(mColor == other.mColor) &&
@@ -197,7 +191,7 @@ public class Card implements Serializable {
 	
 	public Card getCompleter(Card c) {
 		if (isBlank() || c.isBlank()) {
-			return new Card(null,null,null,null);
+			return BLANK_CARD;
 		}
 		Shape shape = null;
 		Count count = null;

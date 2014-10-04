@@ -113,8 +113,7 @@ public class HandFragment extends Fragment {
         for (int y = 0; y < mYDim; y++) {
             for (int x = 0; x < mXDim; x++) {
                 int cardIdx = (y * mXDim) + x;
-                Card nextCard = cardIdx < cards.size() ?
-                        cards.get(cardIdx) : new Card(null, null, null, null);
+                Card nextCard = cardIdx < cards.size() ? cards.get(cardIdx) : Card.BLANK_CARD;
                 mSlots.get(x)[y].setCard(nextCard);
             }
         }
