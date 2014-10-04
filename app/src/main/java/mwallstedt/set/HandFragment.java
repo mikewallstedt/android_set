@@ -109,18 +109,13 @@ public class HandFragment extends Fragment {
             trioHolderView.addView(trioView);
         }
 
-    	if (savedInstanceState != null) {
-            List<Card> cards = ((MainActivity)getActivity()).mSelected;
-            for (int y = 0; y < mYDim; y++) {
-        		for (int x = 0; x < mXDim; x++) {
-                    mSlots.get(x)[y].setCard(cards.get((y * mXDim) + x));
-        		}
-        	}
-        } else {
-            for (int y = 0; y < mYDim; y++) {
-                for (int x = 0; x < mXDim; x++) {
-                    mSlots.get(x)[y].setCard(new Card(null, null, null, null));
-                }
+        List<Card> cards = ((MainActivity)getActivity()).mSelected;
+        for (int y = 0; y < mYDim; y++) {
+            for (int x = 0; x < mXDim; x++) {
+                int cardIdx = (y * mXDim) + x;
+                Card nextCard = cardIdx < cards.size() ?
+                        cards.get(cardIdx) : new Card(null, null, null, null);
+                mSlots.get(x)[y].setCard(nextCard);
             }
         }
 
@@ -214,12 +209,6 @@ public class HandFragment extends Fragment {
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-    	Card[] cards = new Card[mYDim * mXDim];
-    	for (int y = 0; y < mYDim; y++) {
-    		for (int x = 0; x < mXDim; x++) {
-                cards[(y*mXDim) + x] = mSlots.get(x)[y].getCard();
-    		}
-    	}
         savedInstanceState.putInt(SAVED_TRIAD_COUNT, mXDim);
     }
 
