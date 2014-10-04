@@ -6,5 +6,7 @@
     <string name="action_settings">Settings</string>
     <string name="card_picker_title">Pick a Card, Any Card</string>
     <string name="match_button_label">Sets</string>
+    <string name="new_triad_button_text">+3</string>
+    <string name="delete_triad_button_text">-3</string>
 
 </resources>
