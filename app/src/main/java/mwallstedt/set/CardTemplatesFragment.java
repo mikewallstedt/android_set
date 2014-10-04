@@ -9,7 +9,6 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import java.util.List;
-import java.util.Set;
 
 public class CardTemplatesFragment extends Fragment {
 	private static final String DIALOG_O1 = "o1";

@@ -7,9 +7,7 @@ import android.support.v4.app.FragmentManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 
 public class MainActivity extends FragmentActivity {
