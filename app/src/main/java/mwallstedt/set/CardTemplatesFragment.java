@@ -8,6 +8,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import java.util.List;
+import java.util.Set;
+
 public class CardTemplatesFragment extends Fragment {
 	private static final String DIALOG_O1 = "o1";
 	private static final String DIALOG_O2 = "o2";
@@ -34,7 +37,8 @@ public class CardTemplatesFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup parent,
     		Bundle savedInstanceState) {
     	View v = inflater.inflate(R.layout.fragment_card_templates, parent, false);
-        
+        final List<Card> selected = ((MainActivity)getActivity()).mSelected;
+
         mO1 = (ImageView)v.findViewById(R.id.o1);
         mO1.setOnClickListener(new View.OnClickListener() {
 			@Override

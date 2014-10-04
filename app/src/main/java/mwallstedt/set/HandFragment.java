@@ -15,10 +15,11 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import java.util.List;
+
 public class HandFragment extends Fragment {
 	private static final String TAG = HandFragment.class.getCanonicalName();
-	private static final String SAVED_CARDS = "SAVED_CARDS";
-	
+
 	private class Slot {
 		private final ImageView mView;
 		private Card mCard;
@@ -97,10 +98,10 @@ public class HandFragment extends Fragment {
     	mSlots[2][3] = new Slot((ImageView) v.findViewById(R.id.h23), 3, 2);
     	
     	if (savedInstanceState != null) {
-        	Card[] cards = (Card[]) savedInstanceState.getSerializable(SAVED_CARDS);
-        	for (int y = 0; y < mYDim; y++) {
+            List<Card> cards = ((MainActivity)getActivity()).mSelected;
+            for (int y = 0; y < mYDim; y++) {
         		for (int x = 0; x < mXDim; x++) {
-        			 mSlots[y][x].setCard(cards[(y*mXDim) + x]);
+        			 mSlots[y][x].setCard(cards.get((y*mXDim) + x));
         		}
         	}
         }
@@ -129,8 +130,10 @@ public class HandFragment extends Fragment {
     	if (requestCode == CardTemplatesFragment.PICK_CARD_CODE) {
     		Log.i(TAG, "PICK_CARD_CODE is present");
     		Card card = (Card) data.getSerializableExtra(EXTRA_CARD);
-    		Log.i(TAG, "Card = " + card);
+            ((MainActivity)getActivity()).mSelected.add(card);
+            Log.i(TAG, "Card = " + card);
     		mSlots[mY][mX].setCard(card);
+            ((MainActivity)getActivity()).mSelected.add(card);
     		mX += 1;
     		if (mX >= mXDim) {
     			mX = 0;
@@ -143,17 +146,6 @@ public class HandFragment extends Fragment {
     	} else {
     		Log.i(TAG, "PICK_CARD_CODE missing");
     	}
-    }
-    
-    @Override
-    public void onSaveInstanceState(Bundle savedInstanceState) {
-    	Card[] cards = new Card[mYDim * mXDim];
-    	for (int y = 0; y < mYDim; y++) {
-    		for (int x = 0; x < mXDim; x++) {
-    			cards[(y*mXDim) + x] = mSlots[y][x].getCard();
-    		}
-    	}
-    	savedInstanceState.putSerializable(SAVED_CARDS, cards);
     }
     
     private void findSet() {

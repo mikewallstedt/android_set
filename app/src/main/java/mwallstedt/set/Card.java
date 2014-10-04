@@ -188,8 +188,17 @@ public class Card implements Serializable {
 		}
 		return sHDrawableId[mShape.ordinal()][mCount.ordinal()][mColor.ordinal()][mFill.ordinal()];
 	}
-	
-	@Override
+
+    @Override
+    public int hashCode() {
+        int result = mShape.hashCode();
+        result = 31 * result + mCount.hashCode();
+        result = 31 * result + mColor.hashCode();
+        result = 31 * result + mFill.hashCode();
+        return result;
+    }
+
+    @Override
 	public boolean equals(Object o) {
 		Log.i(TAG, "Calling Card.equals");
 		if (o == null) {
