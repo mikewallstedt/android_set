@@ -12,60 +12,42 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class HandFragment extends Fragment {
-    public static final String EXTRA_CARD = "com.example.setsolver.EXTRA_CARD";
-
 	private static final String TAG = HandFragment.class.getCanonicalName();
-    private static final String SAVED_ROW_COUNT = "SAVED_ROW_COUNT";
-    private static final int ROW_SIZE = 3;
-    private static final int DEFAULT_NUMBER_OF_ROWS = 4;
 
-    private List<Row> mSlots;
-    private RowNum cursorRow = new RowNum(0);
-    private ColNum cursorCol = new ColNum(0);
-    private int numRows;
-
-    private static class RowNum {
-        int y;
-        private RowNum(int y) {
-            this.y = y;
-        }
-    }
-
-    private static class ColNum {
-        int x;
-        private ColNum(int x) {
-            this.x = x;
-        }
-    }
-
-    private static class Row {
-        List<Slot> slots = new ArrayList<Slot>();
-    }
+    private static final String SAVED_TRIAD_COUNT = "SAVED_TRIAD_COUNT";
+    private static final int TRIAD_SIZE = 3;
+    private static final int DEFAULT_NUMBER_OF_TRIADS = 4;
 
     private class Slot {
 		private final ImageView mView;
 		private Card mCard;
 
-		private Slot(ImageView view, final RowNum r, final ColNum c) {
+		private Slot(ImageView view, final int x, final int y) {
 			mView = view;
 			view.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
-                    getSlot(cursorRow, cursorCol).unhighlight();
+                    mSlots.get(mX)[mY].unhighlight();
 					highlight(getResources().getColor(R.color.cursor));
-					cursorRow = r;
-                    cursorCol = c;
-                    Log.i("Set cursor: row ", + r.y + " col " + c.x);
+					mX = x;
+					mY = y;
 				}
 			});
-			mCard = Card.BLANK_CARD;
+			mCard = new Card(null,null,null,null);
 		}
 
 		private void setCard(Card card) {
@@ -90,16 +72,23 @@ public class HandFragment extends Fragment {
 		}
 	}
 
+	private List<Slot[]> mSlots;
+	private int mX, mY;
+	private int mXDim, mYDim;
+
+	public static final String EXTRA_CARD = "com.example.setsolver.EXTRA_CARD";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.i(TAG, "onCreate");
         if (savedInstanceState != null) {
-            numRows = savedInstanceState.getInt(SAVED_ROW_COUNT);
+            mXDim = savedInstanceState.getInt(SAVED_TRIAD_COUNT);
         } else {
-            numRows = DEFAULT_NUMBER_OF_ROWS;
+            mXDim = DEFAULT_NUMBER_OF_TRIADS;
         }
-        Log.i(TAG, "Num rows: " + numRows);
+        Log.i(TAG, "Num triads: " + mXDim);
+        mYDim = TRIAD_SIZE;
+        Log.i(TAG, "onCreate");
     }
 
     @Override
@@ -108,81 +97,93 @@ public class HandFragment extends Fragment {
     	super.onCreateView(inflater, parent, savedInstanceState);
     	View v = inflater.inflate(R.layout.fragment_hand, parent, false);
         final LinearLayout trioHolderView = (LinearLayout) v.findViewById(R.id.trio_holder);
-        mSlots = new ArrayList<Row>();
-
-        for (int ri = 0; ri < numRows; ri++) {
-            Row row = new Row();
-            LinearLayout rowView = new LinearLayout(getActivity());
-            rowView.setOrientation(LinearLayout.HORIZONTAL);
-            for (int ci = 0; ci < ROW_SIZE; ci++) {
+    	mX = 0;
+    	mY = 0;
+        mSlots = new ArrayList<Slot[]>();
+        for (int x = 0; x < mXDim; x++) {
+            Slot[] slots = new Slot[TRIAD_SIZE];
+            LinearLayout trioView = new LinearLayout(getActivity());
+            trioView.setOrientation(LinearLayout.VERTICAL);
+            for (int y = 0; y < mYDim; y++) {
                 ImageView imageView = new ImageView(getActivity());
-                Slot slot = new Slot(imageView, new RowNum(ri), new ColNum(ci));
-                slot.setCard(getHand().get(getIndexInHand(new RowNum(ri), new ColNum(ci))));
-                row.slots.add(slot);
-                rowView.addView(imageView);
+                slots[y] = new Slot(imageView, x, y);
+                trioView.addView(imageView);
             }
-            mSlots.add(row);
-            trioHolderView.addView(rowView);
+            mSlots.add(slots);
+            trioHolderView.addView(trioView);
         }
 
-        if (numRows > 0) {
-            mSlots.get(0).slots.get(0).highlight(getResources().getColor(R.color.cursor));
+        for (int y = 0; y < mYDim; y++) {
+            for (int x = 0; x < mXDim; x++) {
+                mSlots.get(x)[y].setCard(getSelected().get(getIndexInSelected(x, y)));
+            }
         }
-//		Button matchButton = (Button) v.findViewById(R.id.match_button);
-//		matchButton.setOnClickListener(new OnClickListener() {
-//			@Override
-//			public void onClick(View v) {
-//				solve();
-//			}
-//		});
-//        Button newTriadButton = (Button) v.findViewById(R.id.new_triad_button);
-//        newTriadButton.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                onAddRow(trioHolderView);
-//            }
-//        });
-//        Button deleteTriadButton = (Button) v.findViewById(R.id.delete_triad_button);
-//        deleteTriadButton.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                onDeleteTriad(trioHolderView);
-//            }
-//        });
+
+        if (mXDim > 0) {
+            mSlots.get(0)[0].highlight(getResources().getColor(R.color.cursor));
+        }
+		Button matchButton = (Button) v.findViewById(R.id.match_button);
+		matchButton.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				solve();
+			}
+		});
+        Button newTriadButton = (Button) v.findViewById(R.id.new_triad_button);
+        newTriadButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onAddTriad(trioHolderView);
+            }
+        });
+        Button deleteTriadButton = (Button) v.findViewById(R.id.delete_triad_button);
+        deleteTriadButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                onDeleteTriad(trioHolderView);
+            }
+        });
         return v;
     }
 
-    private void onAddRow(LinearLayout trioHolderView) {
+    private void onAddTriad(LinearLayout trioHolderView) {
+        int x = mXDim;
+        mXDim++;
+        Slot[] slots = new Slot[TRIAD_SIZE];
         LinearLayout trioView = new LinearLayout(getActivity());
-        trioView.setOrientation(LinearLayout.HORIZONTAL);
-        Row row = new Row();
-        for (int i = 0; i < ROW_SIZE; i++) {
+        trioView.setOrientation(LinearLayout.VERTICAL);
+        for (int y = 0; y < mYDim; y++) {
             ImageView imageView = new ImageView(getActivity());
-            row.slots.add(new Slot(imageView, new RowNum(numRows), new ColNum(i)));
+            slots[y] = new Slot(imageView, x, y);
             trioView.addView(imageView);
+            slots[y].setCard(new Card(null,null,null,null));
         }
+        mSlots.add(slots);
         trioHolderView.addView(trioView);
-        mSlots.add(row);
-        numRows++;
-        resetCursor();
+        mSlots.get(mX)[mY].unhighlight();
+        mX = 0;
+        mY = 0;
+        mSlots.get(0)[0].highlight(getResources().getColor(R.color.cursor));
     }
 
     private void onDeleteTriad(LinearLayout trioHolderView) {
-        getSlot(cursorRow, cursorCol).unhighlight();
-        if (numRows <= 0) {
+        mSlots.get(mX)[mY].unhighlight();
+        int x = mSlots.size() - 1;
+        if (x < 0) {
             return;
         }
-
-        RowNum rowNum = new RowNum(numRows-1);
-        for (int y = 0; y < ROW_SIZE; y++) {
-            getHand().set(getIndexInHand(rowNum, new ColNum(y)), Card.BLANK_CARD);
+        Slot[] removed = mSlots.remove(x);
+        for (int y = 0; y < removed.length; y++) {
+            getSelected().set(getIndexInSelected(mXDim - 1, y), Card.BLANK_CARD);
         }
+        mXDim--;
 
-        trioHolderView.removeViewAt(numRows);
-        if (numRows > 0) {
-            resetCursor();
+        trioHolderView.removeViewAt(x + 1);
+        if (x >= 1) {
+            mX = 0;
+            mY = 0;
+            mSlots.get(0)[0].highlight(getResources().getColor(R.color.cursor));
         }
-        numRows--;
     }
 
     @Override
@@ -199,12 +200,12 @@ public class HandFragment extends Fragment {
     		Log.d(TAG, "PICK_CARD_CODE is present");
     		Card card = (Card) data.getSerializableExtra(EXTRA_CARD);
     		Log.i(TAG, "Card = " + card);
-            if (numRows <= 0) {
+            if (mXDim < 1) {
                 return;
             }
 
-            getHand().set(getIndexInHand(cursorRow, cursorCol), card);
-            getSlot(cursorRow, cursorCol).setCard(card);
+            getSelected().set(getIndexInSelected(mX, mY), card);
+            mSlots.get(mX)[mY].setCard(card);
             highlightNext();
     	} else {
     		Log.i(TAG, "PICK_CARD_CODE missing");
@@ -212,91 +213,84 @@ public class HandFragment extends Fragment {
     }
 
     private void highlightNext() {
-        getSlot(cursorRow, cursorCol).unhighlight();
-        cursorCol.x++;
-        if (cursorCol.x >= ROW_SIZE) {
-            cursorCol.x = 0;
-            cursorRow.y = (cursorRow.y + 1) % numRows;
+        mSlots.get(mX)[mY].unhighlight();
+        mX += 1;
+        if (mX >= mXDim) {
+            mX = 0;
+            mY += 1;
         }
-        getSlot(cursorRow, cursorCol).highlight(getResources().getColor(R.color.cursor));
+        if (mY >= mYDim) {
+            mY = 0;
+        }
+        mSlots.get(mX)[mY].highlight(getResources().getColor(R.color.cursor));
     }
 
-    private List<Card> getHand() {
+    private List<Card> getSelected() {
         return ((MainActivity) getActivity()).mSelected;
     }
 
-    private int getIndexInHand(RowNum r, ColNum c) {
-        return r.y * ROW_SIZE + c.x;
-    }
-
-    private Slot getSlot(RowNum r, ColNum c) {
-        return mSlots.get(r.y).slots.get(c.x);
-    }
-
-    private void resetCursor() {
-        cursorCol = new ColNum(0);
-        cursorRow = new RowNum(0);
-        getSlot(new RowNum(0), new ColNum(0)).highlight(getResources().getColor(R.color.cursor));
+    private int getIndexInSelected(int x, int y) {
+        return y * mXDim + x;
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putInt(SAVED_ROW_COUNT, numRows);
+        savedInstanceState.putInt(SAVED_TRIAD_COUNT, mXDim);
     }
 
     private void solve() {
-//        List<Set<Card>> sets = findSets();
-//        Set<Card> unified = new HashSet<Card>();
-//        for (Set<Card> set: sets) {
-//            unified.addAll(set);
-//        }
-//
-//        int solutionColor = getResources().getColor(R.color.solution);
-//        for (Set<Card> set : sets) {
-//            for (int i = 0; i < (mXDim * mYDim); i++) {
-//                int x = i % mXDim;
-//                int y = i / mXDim;
-//                Slot slot = mSlots.get(x)[y];
-//                if (slot.getCard() == null || !unified.contains(slot.getCard())) {
-//                    slot.unhighlight();
-//                }
-//                else if (set.contains(slot.getCard())) {
-//                    slot.highlight(solutionColor);
-//                }
-//            }
-//            solutionColor += 0x00222222;
-//        }
-//        Toast toast = Toast.makeText(getActivity(), "Num sets: " + sets.size(), Toast.LENGTH_SHORT);
-//        toast.show();
+        List<Set<Card>> sets = findSets();
+        Set<Card> unified = new HashSet<Card>();
+        for (Set<Card> set: sets) {
+            unified.addAll(set);
+        }
+
+        int solutionColor = getResources().getColor(R.color.solution);
+        for (Set<Card> set : sets) {
+            for (int i = 0; i < (mXDim * mYDim); i++) {
+                int x = i % mXDim;
+                int y = i / mXDim;
+                Slot slot = mSlots.get(x)[y];
+                if (slot.getCard() == null || !unified.contains(slot.getCard())) {
+                    slot.unhighlight();
+                }
+                else if (set.contains(slot.getCard())) {
+                    slot.highlight(solutionColor);
+                }
+            }
+            solutionColor += 0x00222222;
+        }
+        Toast toast = Toast.makeText(getActivity(), "Num sets: " + sets.size(), Toast.LENGTH_SHORT);
+        toast.show();
     }
 
-//    private List<Set<Card>> findSets() {
-//        List<Set<Card>> result = new ArrayList<Set<Card>>();
-//        for (int first = 0; first < (mXDim * mYDim); first++) {
-//    		int firstX = first % mXDim;
-//    		int firstY = first / mXDim;
-//            Card firstCard = mSlots.get(firstX)[firstY].getCard();
-//    		if ((firstCard == null) || firstCard.isBlank()) {
-//    			continue;
-//    		}
-//    		for (int second = first + 1; second < (mXDim * mYDim); second++) {
-//    			int secondX = second % mXDim;
-//    			int secondY = second / mXDim;
-//                Card secondCard = mSlots.get(secondX)[secondY].getCard();
-//    			if ((secondCard == null) || secondCard.isBlank()) {
-//    				continue;
-//    			}
-//                Card thirdCard = firstCard.getCompleter(secondCard);
-//    			Log.i(TAG, "first=" + first + ",second=" + second + "," + thirdCard);
-//    			for (int third = second + 1; third < (mXDim * mYDim); third++) {
-//    				int thirdX = third % mXDim;
-//    				int thirdY = third / mXDim;
-//                    if (thirdCard.equals(mSlots.get(thirdX)[thirdY].getCard())) {
-//    					result.add(new HashSet<Card>(Arrays.asList(firstCard, secondCard, thirdCard)));
-//    				}
-//    			}
-//    		}
-//    	}
-//        return  result;
-//    }
+    private List<Set<Card>> findSets() {
+        List<Set<Card>> result = new ArrayList<Set<Card>>();
+        for (int first = 0; first < (mXDim * mYDim); first++) {
+    		int firstX = first % mXDim;
+    		int firstY = first / mXDim;
+            Card firstCard = mSlots.get(firstX)[firstY].getCard();
+    		if ((firstCard == null) || firstCard.isBlank()) {
+    			continue;
+    		}
+    		for (int second = first + 1; second < (mXDim * mYDim); second++) {
+    			int secondX = second % mXDim;
+    			int secondY = second / mXDim;
+                Card secondCard = mSlots.get(secondX)[secondY].getCard();
+    			if ((secondCard == null) || secondCard.isBlank()) {
+    				continue;
+    			}
+                Card thirdCard = firstCard.getCompleter(secondCard);
+    			Log.i(TAG, "first=" + first + ",second=" + second + "," + thirdCard);
+    			for (int third = second + 1; third < (mXDim * mYDim); third++) {
+    				int thirdX = third % mXDim;
+    				int thirdY = third / mXDim;
+                    if (thirdCard.equals(mSlots.get(thirdX)[thirdY].getCard())) {
+    					result.add(new HashSet<Card>(Arrays.asList(firstCard, secondCard, thirdCard)));
+    				}
+    			}
+    		}
+    	}
+        return  result;
+    }
 }
