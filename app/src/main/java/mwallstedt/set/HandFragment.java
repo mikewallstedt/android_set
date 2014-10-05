@@ -19,7 +19,6 @@ import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -86,9 +85,7 @@ public class HandFragment extends Fragment {
         } else {
             mXDim = DEFAULT_NUMBER_OF_TRIADS;
         }
-        Log.i(TAG, "Num triads: " + mXDim);
         mYDim = TRIAD_SIZE;
-        Log.i(TAG, "onCreate");
     }
 
     @Override
@@ -199,7 +196,6 @@ public class HandFragment extends Fragment {
     	if (requestCode == CardTemplatesFragment.PICK_CARD_CODE) {
     		Log.d(TAG, "PICK_CARD_CODE is present");
     		Card card = (Card) data.getSerializableExtra(EXTRA_CARD);
-    		Log.i(TAG, "Card = " + card);
             if (mXDim < 1) {
                 return;
             }
@@ -208,7 +204,7 @@ public class HandFragment extends Fragment {
             mSlots.get(mX)[mY].setCard(card);
             highlightNext();
     	} else {
-    		Log.i(TAG, "PICK_CARD_CODE missing");
+    		Log.d(TAG, "PICK_CARD_CODE missing");
     	}
     }
 
@@ -274,7 +270,6 @@ public class HandFragment extends Fragment {
     				continue;
     			}
                 Card thirdCard = firstCard.getCompleter(secondCard);
-    			Log.i(TAG, "first=" + first + ",second=" + second + "," + thirdCard);
     			for (int third = second + 1; third < (mXDim * mYDim); third++) {
     				int thirdX = third % mXDim;
     				int thirdY = third / mXDim;
@@ -284,6 +279,6 @@ public class HandFragment extends Fragment {
     			}
     		}
     	}
-        return Collections.EMPTY_SET;
+        return Collections.emptySet();
     }
 }

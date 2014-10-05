@@ -1,7 +1,5 @@
 package mwallstedt.set;
 
-import android.util.Log;
-
 import java.io.Serializable;
 
 public class Card implements Serializable {
@@ -60,8 +58,6 @@ public class Card implements Serializable {
 			},
 		},
 	};
-	
-	private static final String TAG = Card.class.getCanonicalName();
 
 	public static enum Shape {
 		OVAL, DIAMOND, SQUIGGLE
@@ -115,9 +111,6 @@ public class Card implements Serializable {
 
     @Override
 	public boolean equals(Object o) {
-		if (o == null) {
-			return false;
-		}
 		if (!(o instanceof Card)) {
 			return false;
 		}
