@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="cursor">#CCFFCCAA</color>
-    <color name="solution">#CC71C837</color>
+    <color name="cursor">#ff22daff</color>
+    <color name="solution">#ffffc32b</color>
 </resources>

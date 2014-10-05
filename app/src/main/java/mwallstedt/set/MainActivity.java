@@ -22,7 +22,9 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
         
         if (savedInstanceState != null) {
-            mSelected = (List<Card>)savedInstanceState.getSerializable(SELECTED_CARDS);
+            @SuppressWarnings("unchecked")
+            List<Card> cardList = (List<Card>)savedInstanceState.getSerializable(SELECTED_CARDS);
+            mSelected = cardList;
         } else {
             for (int i = 0; i < 81; i++) {
                 mSelected.add(Card.BLANK_CARD);

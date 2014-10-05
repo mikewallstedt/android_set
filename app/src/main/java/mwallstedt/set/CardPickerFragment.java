@@ -8,11 +8,10 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.util.SparseArray;
 import android.view.View;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class CardPickerFragment extends DialogFragment {
 	public static final String EXTRA_VIEW_ID = "com.example.setsolver.view_id";
@@ -50,7 +49,7 @@ public class CardPickerFragment extends DialogFragment {
         int viewId = getArguments().getInt(EXTRA_VIEW_ID);
 		View v = getActivity().getLayoutInflater()
 				.inflate(viewId, null);
-        Map<Integer, Card> viewToCard = new HashMap<Integer, Card>();
+        SparseArray<Card> viewToCard = new SparseArray<Card>();
 		switch (viewId) {
 		case R.layout.dialog_d1:
 			viewToCard.put(R.id.d1ge, new Card(Card.Shape.DIAMOND, Card.Count.ONE, Card.Color.GREEN, Card.Fill.EMPTY));
@@ -154,7 +153,8 @@ public class CardPickerFragment extends DialogFragment {
 		}
 
         List<Card> selected = ((MainActivity)getActivity()).mSelected;
-        for (Integer cardViewId : viewToCard.keySet()) {
+        for (int i = 0; i < viewToCard.size(); i++) {
+            int cardViewId = viewToCard.keyAt(i);
             Card card = viewToCard.get(cardViewId);
             if (selected.contains(card)) {
                 v.findViewById(cardViewId).setAlpha(0);
