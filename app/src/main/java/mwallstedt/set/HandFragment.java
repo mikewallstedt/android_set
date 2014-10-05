@@ -109,10 +109,9 @@ public class HandFragment extends Fragment {
             trioHolderView.addView(trioView);
         }
 
-        List<Card> selected = ((MainActivity)getActivity()).mSelected;
         for (int y = 0; y < mYDim; y++) {
             for (int x = 0; x < mXDim; x++) {
-                mSlots.get(x)[y].setCard(selected.get((y * mXDim) + x));
+                mSlots.get(x)[y].setCard(getSelected().get(getIndexInSelected(x, y)));
             }
         }
 
@@ -130,45 +129,57 @@ public class HandFragment extends Fragment {
         newTriadButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                int x = mXDim;
-                mXDim++;
-                Slot[] slots = new Slot[TRIAD_SIZE];
-                LinearLayout trioView = new LinearLayout(getActivity());
-                trioView.setOrientation(LinearLayout.VERTICAL);
-                for (int y = 0; y < mYDim; y++) {
-                    ImageView imageView = new ImageView(getActivity());
-                    slots[y] = new Slot(imageView, x, y);
-                    trioView.addView(imageView);
-                    slots[y].setCard(new Card(null,null,null,null));
-                }
-                mSlots.add(slots);
-                trioHolderView.addView(trioView);
-                mSlots.get(mX)[mY].unhighlight();
-                mX = 0;
-                mY = 0;
-                mSlots.get(0)[0].highlight();
+                onAddTriad(trioHolderView);
             }
         });
         Button deleteTriadButton = (Button) v.findViewById(R.id.delete_triad_button);
         deleteTriadButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                mSlots.get(mX)[mY].unhighlight();
-                int x = mSlots.size() - 1;
-                if (x < 0) {
-                    return;
-                }
-                mXDim--;
-                mSlots.remove(x);
-                trioHolderView.removeViewAt(x + 1);
-                if (x >= 1) {
-                    mX = 0;
-                    mY = 0;
-                    mSlots.get(0)[0].highlight();
-                }
+                onDeleteTriad(trioHolderView);
             }
         });
         return v;
+    }
+
+    private void onAddTriad(LinearLayout trioHolderView) {
+        int x = mXDim;
+        mXDim++;
+        Slot[] slots = new Slot[TRIAD_SIZE];
+        LinearLayout trioView = new LinearLayout(getActivity());
+        trioView.setOrientation(LinearLayout.VERTICAL);
+        for (int y = 0; y < mYDim; y++) {
+            ImageView imageView = new ImageView(getActivity());
+            slots[y] = new Slot(imageView, x, y);
+            trioView.addView(imageView);
+            slots[y].setCard(new Card(null,null,null,null));
+        }
+        mSlots.add(slots);
+        trioHolderView.addView(trioView);
+        mSlots.get(mX)[mY].unhighlight();
+        mX = 0;
+        mY = 0;
+        mSlots.get(0)[0].highlight();
+    }
+
+    private void onDeleteTriad(LinearLayout trioHolderView) {
+        mSlots.get(mX)[mY].unhighlight();
+        int x = mSlots.size() - 1;
+        if (x < 0) {
+            return;
+        }
+        Slot[] removed = mSlots.remove(x);
+        for (int y = 0; y < removed.length; y++) {
+            getSelected().set(getIndexInSelected(mXDim - 1, y), Card.BLANK_CARD);
+        }
+        mXDim--;
+
+        trioHolderView.removeViewAt(x + 1);
+        if (x >= 1) {
+            mX = 0;
+            mY = 0;
+            mSlots.get(0)[0].highlight();
+        }
     }
 
     @Override
@@ -189,8 +200,7 @@ public class HandFragment extends Fragment {
                 return;
             }
 
-            List<Card> selected = ((MainActivity) getActivity()).mSelected;
-            selected.set((mY * mXDim) + mX, card);
+            getSelected().set(getIndexInSelected(mX, mY), card);
             mSlots.get(mX)[mY].setCard(card);
     		mX += 1;
     		if (mX >= mXDim) {
@@ -204,6 +214,14 @@ public class HandFragment extends Fragment {
     	} else {
     		Log.i(TAG, "PICK_CARD_CODE missing");
     	}
+    }
+
+    private List<Card> getSelected() {
+        return ((MainActivity) getActivity()).mSelected;
+    }
+
+    private int getIndexInSelected(int x, int y) {
+        return y * mXDim + x;
     }
 
     @Override
