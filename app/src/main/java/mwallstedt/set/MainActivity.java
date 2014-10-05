@@ -7,14 +7,36 @@ import android.support.v4.app.FragmentManager;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 
 public class MainActivity extends FragmentActivity {
 
     private final String SELECTED_CARDS = "SELECTED_CARDS";
 
+    private Set<Card> mCardsInPlay = new HashSet<Card>();
+
+    private boolean mIsActiveCursor;
+
     protected List<Card> mSelected = new ArrayList<Card>();
+
+    public Set<Card> getCardsInPlay() {
+        return mCardsInPlay;
+    }
+
+    public void removeCardInPlay(Card card) {
+        mCardsInPlay.remove(card);
+    }
+
+    public void addCardInPlay(Card card) {
+        mCardsInPlay.add(card);
+    }
+
+    public boolean isActiveCursor() {
+        return mIsActiveCursor;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

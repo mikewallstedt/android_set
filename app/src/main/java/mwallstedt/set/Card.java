@@ -102,6 +102,9 @@ public class Card implements Serializable {
 	
     @Override
     public int hashCode() {
+        if (isBlank()) {
+            return 1;
+        }
         int result = mShape.hashCode();
         result = 31 * result + mCount.hashCode();
         result = 31 * result + mColor.hashCode();
