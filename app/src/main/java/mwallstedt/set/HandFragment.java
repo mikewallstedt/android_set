@@ -18,7 +18,12 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class HandFragment extends Fragment {
 	private static final String TAG = HandFragment.class.getCanonicalName();
@@ -27,7 +32,7 @@ public class HandFragment extends Fragment {
     private static final int TRIAD_SIZE = 3;
     private static final int DEFAULT_NUMBER_OF_TRIADS = 4;
 
-	private class Slot {
+    private class Slot {
 		private final ImageView mView;
 		private Card mCard;
 
@@ -37,7 +42,7 @@ public class HandFragment extends Fragment {
 				@Override
 				public void onClick(View arg0) {
                     mSlots.get(mX)[mY].unhighlight();
-					highlight();
+					highlight(getResources().getColor(R.color.cursor));
 					mX = x;
 					mY = y;
 				}
@@ -56,8 +61,8 @@ public class HandFragment extends Fragment {
 			return mCard;
 		}
 
-		private void highlight() {
-		    mView.setBackgroundColor(0xCCFFCCAA);
+        private void highlight(int color) {
+            mView.setBackgroundColor(color);
             mView.invalidate();
         }
 
@@ -115,13 +120,13 @@ public class HandFragment extends Fragment {
         }
 
         if (mXDim > 0) {
-            mSlots.get(0)[0].highlight();
+            mSlots.get(0)[0].highlight(getResources().getColor(R.color.cursor));
         }
 		Button matchButton = (Button) v.findViewById(R.id.match_button);
 		matchButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				findSet();
+				solve();
 			}
 		});
         Button newTriadButton = (Button) v.findViewById(R.id.new_triad_button);
@@ -158,7 +163,7 @@ public class HandFragment extends Fragment {
         mSlots.get(mX)[mY].unhighlight();
         mX = 0;
         mY = 0;
-        mSlots.get(0)[0].highlight();
+        mSlots.get(0)[0].highlight(getResources().getColor(R.color.cursor));
     }
 
     private void onDeleteTriad(LinearLayout trioHolderView) {
@@ -177,7 +182,7 @@ public class HandFragment extends Fragment {
         if (x >= 1) {
             mX = 0;
             mY = 0;
-            mSlots.get(0)[0].highlight();
+            mSlots.get(0)[0].highlight(getResources().getColor(R.color.cursor));
         }
     }
 
@@ -217,7 +222,7 @@ public class HandFragment extends Fragment {
         if (mY >= mYDim) {
             mY = 0;
         }
-        mSlots.get(mX)[mY].highlight();
+        mSlots.get(mX)[mY].highlight(getResources().getColor(R.color.cursor));
     }
 
     private List<Card> getSelected() {
@@ -233,8 +238,28 @@ public class HandFragment extends Fragment {
         savedInstanceState.putInt(SAVED_TRIAD_COUNT, mXDim);
     }
 
-    private void findSet() {
-    	for (int first = 0; first < (mXDim * mYDim); first++) {
+    private void solve() {
+        Set<Card> set = findSet();
+        if (set.isEmpty()) {
+            Toast toast = Toast.makeText(getActivity(), "No sets", Toast.LENGTH_SHORT);
+            toast.show();
+            return;
+        }
+
+        for (Card card : set) {
+            for (int i = 0; i < (mXDim * mYDim); i++) {
+                int x = i % mXDim;
+                int y = i / mXDim;
+                Slot slot = mSlots.get(x)[y];
+                if (card.equals(slot.getCard())) {
+                    slot.highlight(getResources().getColor(R.color.solution));
+                }
+            }
+        }
+    }
+
+    private Set<Card> findSet() {
+        for (int first = 0; first < (mXDim * mYDim); first++) {
     		int firstX = first % mXDim;
     		int firstY = first / mXDim;
             Card firstCard = mSlots.get(firstX)[firstY].getCard();
@@ -254,16 +279,11 @@ public class HandFragment extends Fragment {
     				int thirdX = third % mXDim;
     				int thirdY = third / mXDim;
                     if (thirdCard.equals(mSlots.get(thirdX)[thirdY].getCard())) {
-    					String message = first + "," + second + "," + third;
-    					Toast toast = Toast.makeText(getActivity(), message, Toast.LENGTH_SHORT);
-    					toast.show();
-    					return;
+    					return new HashSet<Card>(Arrays.asList(firstCard, secondCard, thirdCard));
     				}
     			}
     		}
     	}
-    	Toast toast = Toast.makeText(getActivity(), "No sets", Toast.LENGTH_SHORT);
-    	toast.show();
+        return Collections.EMPTY_SET;
     }
-
 }
