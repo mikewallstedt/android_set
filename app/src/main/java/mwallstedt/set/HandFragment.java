@@ -239,26 +239,33 @@ public class HandFragment extends Fragment {
     }
 
     private void solve() {
-        Set<Card> set = findSet();
-        if (set.isEmpty()) {
-            Toast toast = Toast.makeText(getActivity(), "No sets", Toast.LENGTH_SHORT);
-            toast.show();
-            return;
+        List<Set<Card>> sets = findSets();
+        Set<Card> unified = new HashSet<Card>();
+        for (Set<Card> set: sets) {
+            unified.addAll(set);
         }
 
-        for (Card card : set) {
+        int solutionColor = getResources().getColor(R.color.solution);
+        for (Set<Card> set : sets) {
             for (int i = 0; i < (mXDim * mYDim); i++) {
                 int x = i % mXDim;
                 int y = i / mXDim;
                 Slot slot = mSlots.get(x)[y];
-                if (card.equals(slot.getCard())) {
-                    slot.highlight(getResources().getColor(R.color.solution));
+                if (slot.getCard() == null || !unified.contains(slot.getCard())) {
+                    slot.unhighlight();
+                }
+                else if (set.contains(slot.getCard())) {
+                    slot.highlight(solutionColor);
                 }
             }
+            solutionColor += 0x00222222;
         }
+        Toast toast = Toast.makeText(getActivity(), "Num sets: " + sets.size(), Toast.LENGTH_SHORT);
+        toast.show();
     }
 
-    private Set<Card> findSet() {
+    private List<Set<Card>> findSets() {
+        List<Set<Card>> result = new ArrayList<Set<Card>>();
         for (int first = 0; first < (mXDim * mYDim); first++) {
     		int firstX = first % mXDim;
     		int firstY = first / mXDim;
@@ -279,11 +286,11 @@ public class HandFragment extends Fragment {
     				int thirdX = third % mXDim;
     				int thirdY = third / mXDim;
                     if (thirdCard.equals(mSlots.get(thirdX)[thirdY].getCard())) {
-    					return new HashSet<Card>(Arrays.asList(firstCard, secondCard, thirdCard));
+    					result.add(new HashSet<Card>(Arrays.asList(firstCard, secondCard, thirdCard)));
     				}
     			}
     		}
     	}
-        return Collections.EMPTY_SET;
+        return  result;
     }
 }
