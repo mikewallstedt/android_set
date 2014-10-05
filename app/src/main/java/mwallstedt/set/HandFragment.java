@@ -109,12 +109,10 @@ public class HandFragment extends Fragment {
             trioHolderView.addView(trioView);
         }
 
-        List<Card> cards = ((MainActivity)getActivity()).mSelected;
+        List<Card> selected = ((MainActivity)getActivity()).mSelected;
         for (int y = 0; y < mYDim; y++) {
             for (int x = 0; x < mXDim; x++) {
-                int cardIdx = (y * mXDim) + x;
-                Card nextCard = cardIdx < cards.size() ? cards.get(cardIdx) : Card.BLANK_CARD;
-                mSlots.get(x)[y].setCard(nextCard);
+                mSlots.get(x)[y].setCard(selected.get((y * mXDim) + x));
             }
         }
 
@@ -176,22 +174,24 @@ public class HandFragment extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
     	if (resultCode != Activity.RESULT_OK) {
-    		Log.i(TAG, "resultCode not RESULT_OK");
+    		Log.d(TAG, "resultCode not RESULT_OK");
     		return;
     	}
     	if (!data.hasExtra(EXTRA_CARD)) {
-    		Log.i(TAG, "No extra drawable ID");
+    		Log.d(TAG, "No extra drawable ID");
     		return;
     	}
     	if (requestCode == CardTemplatesFragment.PICK_CARD_CODE) {
-    		Log.i(TAG, "PICK_CARD_CODE is present");
+    		Log.d(TAG, "PICK_CARD_CODE is present");
     		Card card = (Card) data.getSerializableExtra(EXTRA_CARD);
     		Log.i(TAG, "Card = " + card);
             if (mXDim < 1) {
                 return;
             }
+
+            List<Card> selected = ((MainActivity) getActivity()).mSelected;
+            selected.set((mY * mXDim) + mX, card);
             mSlots.get(mX)[mY].setCard(card);
-            ((MainActivity)getActivity()).mSelected.add(card);
     		mX += 1;
     		if (mX >= mXDim) {
     			mX = 0;

@@ -23,6 +23,10 @@ public class MainActivity extends FragmentActivity {
         
         if (savedInstanceState != null) {
             mSelected = (List<Card>)savedInstanceState.getSerializable(SELECETD_CARDS);
+        } else {
+            for (int i = 0; i < 81; i++) {
+                mSelected.add(Card.BLANK_CARD);
+            }
         }
 
         FragmentManager fm = getSupportFragmentManager();
