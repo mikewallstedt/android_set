@@ -12,7 +12,7 @@ import java.util.List;
 
 public class MainActivity extends FragmentActivity {
 
-    private final String SELECETD_CARDS = "SELECTED_CARDS";
+    private final String SELECTED_CARDS = "SELECTED_CARDS";
 
     protected List<Card> mSelected = new ArrayList<Card>();
 
@@ -22,7 +22,7 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
         
         if (savedInstanceState != null) {
-            mSelected = (List<Card>)savedInstanceState.getSerializable(SELECETD_CARDS);
+            mSelected = (List<Card>)savedInstanceState.getSerializable(SELECTED_CARDS);
         } else {
             for (int i = 0; i < 81; i++) {
                 mSelected.add(Card.BLANK_CARD);
@@ -51,6 +51,6 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable(SELECETD_CARDS, (Serializable) mSelected);
+        outState.putSerializable(SELECTED_CARDS, (Serializable) mSelected);
     }
 }

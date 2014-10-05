@@ -3,6 +3,7 @@ package mwallstedt.set;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -35,7 +36,7 @@ public class HandFragment extends Fragment {
 			view.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
-					mSlots.get(mX)[mY].unhighlight();
+                    mSlots.get(mX)[mY].unhighlight();
 					highlight();
 					mX = x;
 					mY = y;
@@ -56,15 +57,13 @@ public class HandFragment extends Fragment {
 		}
 
 		private void highlight() {
-			Resources resources = getActivity().getResources();
-    		Drawable drawable = resources.getDrawable(mCard.getHighlightedDrawableId());
-    		mView.setImageDrawable(drawable);
-		}
+		    mView.setBackgroundColor(0xCCFFCCAA);
+            mView.invalidate();
+        }
 
 		private void unhighlight() {
-			Resources resources = getActivity().getResources();
-    		Drawable drawable = resources.getDrawable(mCard.getDrawableId());
-    		mView.setImageDrawable(drawable);
+            mView.setBackgroundColor(Color.WHITE);
+            mView.invalidate();
 		}
 	}
 
@@ -202,18 +201,23 @@ public class HandFragment extends Fragment {
 
             getSelected().set(getIndexInSelected(mX, mY), card);
             mSlots.get(mX)[mY].setCard(card);
-    		mX += 1;
-    		if (mX >= mXDim) {
-    			mX = 0;
-    			mY += 1;
-    		}
-    		if (mY >= mYDim) {
-    			mY = 0;
-    		}
-            mSlots.get(mX)[mY].highlight();
+            highlightNext();
     	} else {
     		Log.i(TAG, "PICK_CARD_CODE missing");
     	}
+    }
+
+    private void highlightNext() {
+        mSlots.get(mX)[mY].unhighlight();
+        mX += 1;
+        if (mX >= mXDim) {
+            mX = 0;
+            mY += 1;
+        }
+        if (mY >= mYDim) {
+            mY = 0;
+        }
+        mSlots.get(mX)[mY].highlight();
     }
 
     private List<Card> getSelected() {

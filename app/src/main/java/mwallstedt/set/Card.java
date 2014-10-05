@@ -61,60 +61,6 @@ public class Card implements Serializable {
 		},
 	};
 	
-	private static final int[][][][] sHDrawableId = {
-		{
-			{
-				{R.drawable.ho1gf, R.drawable.ho1gh, R.drawable.ho1ge,},
-				{R.drawable.ho1rf, R.drawable.ho1rh, R.drawable.ho1re,},
-				{R.drawable.ho1pf, R.drawable.ho1ph, R.drawable.ho1pe,},
-			},
-			{
-				{R.drawable.ho2gf, R.drawable.ho2gh, R.drawable.ho2ge,},
-				{R.drawable.ho2rf, R.drawable.ho2rh, R.drawable.ho2re,},
-				{R.drawable.ho2pf, R.drawable.ho2ph, R.drawable.ho2pe,},
-			},
-			{
-				{R.drawable.ho3gf, R.drawable.ho3gh, R.drawable.ho3ge,},
-				{R.drawable.ho3rf, R.drawable.ho3rh, R.drawable.ho3re,},
-				{R.drawable.ho3pf, R.drawable.ho3ph, R.drawable.ho3pe,},
-			},
-		},
-		{
-			{
-				{R.drawable.hd1gf, R.drawable.hd1gh, R.drawable.hd1ge,},
-				{R.drawable.hd1rf, R.drawable.hd1rh, R.drawable.hd1re,},
-				{R.drawable.hd1pf, R.drawable.hd1ph, R.drawable.hd1pe,},
-			},
-			{
-				{R.drawable.hd2gf, R.drawable.hd2gh, R.drawable.hd2ge,},
-				{R.drawable.hd2rf, R.drawable.hd2rh, R.drawable.hd2re,},
-				{R.drawable.hd2pf, R.drawable.hd2ph, R.drawable.hd2pe,},
-			},
-			{
-				{R.drawable.hd3gf, R.drawable.hd3gh, R.drawable.hd3ge,},
-				{R.drawable.hd3rf, R.drawable.hd3rh, R.drawable.hd3re,},
-				{R.drawable.hd3pf, R.drawable.hd3ph, R.drawable.hd3pe,},				
-			},
-		},
-		{
-			{
-				{R.drawable.hs1gf, R.drawable.hs1gh, R.drawable.hs1ge,},
-				{R.drawable.hs1rf, R.drawable.hs1rh, R.drawable.hs1re,},
-				{R.drawable.hs1pf, R.drawable.hs1ph, R.drawable.hs1pe,},
-			},
-			{
-				{R.drawable.hs2gf, R.drawable.hs2gh, R.drawable.hs2ge,},
-				{R.drawable.hs2rf, R.drawable.hs2rh, R.drawable.hs2re,},
-				{R.drawable.hs2pf, R.drawable.hs2ph, R.drawable.hs2pe,},				
-			},
-			{
-				{R.drawable.hs3gf, R.drawable.hs3gh, R.drawable.hs3ge,},
-				{R.drawable.hs3rf, R.drawable.hs3rh, R.drawable.hs3re,},
-				{R.drawable.hs3pf, R.drawable.hs3ph, R.drawable.hs3pe,},
-			},
-		},
-	};
-
 	private static final String TAG = Card.class.getCanonicalName();
 
 	public static enum Shape {
@@ -158,13 +104,6 @@ public class Card implements Serializable {
 		return sDrawableId[mShape.ordinal()][mCount.ordinal()][mColor.ordinal()][mFill.ordinal()];
 	}
 	
-	public int getHighlightedDrawableId() {
-		if (isBlank()) {
-			return R.drawable.hblank;
-		}
-		return sHDrawableId[mShape.ordinal()][mCount.ordinal()][mColor.ordinal()][mFill.ordinal()];
-	}
-
     @Override
     public int hashCode() {
         int result = mShape.hashCode();
