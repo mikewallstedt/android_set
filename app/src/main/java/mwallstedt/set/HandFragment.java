@@ -133,7 +133,7 @@ public class HandFragment extends Fragment {
         for (int trioIndex = 0; trioIndex < numTrios; trioIndex++) {
             Slot[] slots = new Slot[TRIAD_SIZE];
             LinearLayout trioView = new LinearLayout(getActivity());
-            trioView.setOrientation(LinearLayout.VERTICAL);
+            trioView.setOrientation(LinearLayout.HORIZONTAL);
             for (int indexInTrio = 0; indexInTrio < trioSize; indexInTrio++) {
                 slots[indexInTrio] = new Slot(trioIndex, indexInTrio);
                 trioView.addView(slots[indexInTrio].getView());
@@ -149,7 +149,7 @@ public class HandFragment extends Fragment {
         numTrios++;
         Slot[] slots = new Slot[TRIAD_SIZE];
         LinearLayout trioView = new LinearLayout(getActivity());
-        trioView.setOrientation(LinearLayout.VERTICAL);
+        trioView.setOrientation(LinearLayout.HORIZONTAL);
         for (int indexInTrio = 0; indexInTrio < trioSize; indexInTrio++) {
             slots[indexInTrio] = new Slot(trioIndex, indexInTrio);
             trioView.addView(slots[indexInTrio].getView());
