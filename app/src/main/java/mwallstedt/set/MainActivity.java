@@ -17,7 +17,6 @@ public class MainActivity extends FragmentActivity {
     private final String SELECTED_CARDS = "SELECTED_CARDS";
 
     private Set<Card> mCardsInPlay = new HashSet<Card>();
-    protected List<Card> mSelected = new ArrayList<Card>();
     private HandFragment mHandFragment;
 
     public Set<Card> getCardsInPlay() {
@@ -33,7 +32,6 @@ public class MainActivity extends FragmentActivity {
     }
 
     public void onCardChosen(Card card) {
-        addCardInPlay(card);
         mHandFragment.setCardAtCursor(card);
     }
 
@@ -43,13 +41,7 @@ public class MainActivity extends FragmentActivity {
         setContentView(R.layout.activity_main);
         
         if (savedInstanceState != null) {
-            @SuppressWarnings("unchecked")
-            List<Card> cardList = (List<Card>)savedInstanceState.getSerializable(SELECTED_CARDS);
-            mSelected = cardList;
-        } else {
-            for (int i = 0; i < 81; i++) {
-                mSelected.add(Card.BLANK_CARD);
-            }
+            mCardsInPlay = (Set<Card>)savedInstanceState.getSerializable(SELECTED_CARDS);
         }
 
         FragmentManager fm = getSupportFragmentManager();
@@ -74,6 +66,6 @@ public class MainActivity extends FragmentActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putSerializable(SELECTED_CARDS, (Serializable) mSelected);
+        outState.putSerializable(SELECTED_CARDS, (Serializable) mCardsInPlay);
     }
 }

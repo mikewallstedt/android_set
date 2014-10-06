@@ -185,9 +185,10 @@ public class HandFragment extends Fragment {
 
     public void setCardAtCursor(Card card) {
         Slot slot = mSlots.get(mTrioIndex)[mIndexInTrio];
-        slot.showCard(card);
         getMainActivity().removeCardInPlay(slot.getCard());
-        highlightNext();        
+        slot.showCard(card);
+        getMainActivity().addCardInPlay(card);
+        highlightNext();
     }
 
     private void highlightNext() {

@@ -12,6 +12,7 @@ import android.util.SparseArray;
 import android.view.View;
 
 import java.util.List;
+import java.util.Set;
 
 public class CardPickerFragment extends DialogFragment {
 	public static final String EXTRA_VIEW_ID = "com.example.setsolver.view_id";
@@ -146,11 +147,11 @@ public class CardPickerFragment extends DialogFragment {
 			break;
 		}
 
-        List<Card> selected = ((MainActivity)getActivity()).mSelected;
+        Set<Card> inPlay = ((MainActivity)getActivity()).getCardsInPlay();
         for (int i = 0; i < viewToCard.size(); i++) {
             int cardViewId = viewToCard.keyAt(i);
             Card card = viewToCard.get(cardViewId);
-            if (selected.contains(card)) {
+            if (inPlay.contains(card)) {
                 v.findViewById(cardViewId).setAlpha(0);
             } else {
                 v.findViewById(cardViewId).setAlpha(1);
