@@ -17,10 +17,8 @@ public class MainActivity extends FragmentActivity {
     private final String SELECTED_CARDS = "SELECTED_CARDS";
 
     private Set<Card> mCardsInPlay = new HashSet<Card>();
-
-    private boolean mIsActiveCursor;
-
     protected List<Card> mSelected = new ArrayList<Card>();
+    private HandFragment mHandFragment;
 
     public Set<Card> getCardsInPlay() {
         return mCardsInPlay;
@@ -34,8 +32,9 @@ public class MainActivity extends FragmentActivity {
         mCardsInPlay.add(card);
     }
 
-    public boolean isActiveCursor() {
-        return mIsActiveCursor;
+    public void onCardChosen(Card card) {
+        addCardInPlay(card);
+        mHandFragment.setCardAtCursor(card);
     }
 
     @Override
@@ -63,11 +62,11 @@ public class MainActivity extends FragmentActivity {
         		.commit();
         }
 
-        Fragment handFragment = fm.findFragmentById(R.id.handFragmentContainer);
-        if (handFragment == null) {
-        	handFragment = new HandFragment();
+        mHandFragment = (HandFragment) fm.findFragmentById(R.id.handFragmentContainer);
+        if (mHandFragment == null) {
+            mHandFragment = new HandFragment();
         	fm.beginTransaction()
-        		.add(R.id.handFragmentContainer, handFragment)
+        		.add(R.id.handFragmentContainer, mHandFragment)
         		.commit();
         }
     }

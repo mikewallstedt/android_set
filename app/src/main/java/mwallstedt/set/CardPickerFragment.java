@@ -31,13 +31,7 @@ public class CardPickerFragment extends DialogFragment {
 		cardView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Fragment targetFragment = getTargetFragment();
-				if (targetFragment != null) {
-					Intent i = new Intent();
-					i.putExtra(HandFragment.EXTRA_CARD, card);
-					targetFragment.onActivityResult(
-							getTargetRequestCode(), Activity.RESULT_OK, i);
-				}
+                ((MainActivity)getActivity()).onCardChosen(card);
 				dismiss();
 			}
 		});
