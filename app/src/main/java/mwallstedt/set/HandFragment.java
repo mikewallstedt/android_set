@@ -11,29 +11,25 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Toast;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class HandFragment extends Fragment {
-	private static final String TAG = HandFragment.class.getCanonicalName();
-
     private static final String SAVED_TRIAD_COUNT = "SAVED_TRIAD_COUNT";
     private static final String SAVED_CARDS_DISPLAYED = "SAVED_CARDS_DISPLAYED";
-    public static final String EXTRA_CARD = "com.example.setsolver.EXTRA_CARD";
 
     private static final int TRIAD_SIZE = 3;
-    private static final int DEFAULT_NUMBER_OF_TRIADS = 4;
+    private static final int INITIAL_NUMBER_OF_TRIADS = 4;
 
-    private List<Slot[]> mSlots = new ArrayList<Slot[]>();
-    private List<Card> mInitCards = new ArrayList<Card>();
-    private int mTrioIndex, mIndexInTrio;
-    private int numTrios, trioSize;
+    private HandFragmentHostActivity mHandFragmentHostActivity;
+    private SolutionFragmentHostActivity mSolutionFragmentHostActivity;
+    private List<Slot[]> mSlots;
+    private List<Card> mInitCards;
+    private int mTriadIndex, mIndexInTriad;
+    private int mNumTriads;
 
     private class Slot {
 		private final ImageView mView;
@@ -44,10 +40,15 @@ public class HandFragment extends Fragment {
 			mView.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
-                    mSlots.get(mTrioIndex)[mIndexInTrio].unhighlight();
+                    for (int triadIndex = 0; triadIndex < mNumTriads; triadIndex++) {
+                        for (int cardIndex = 0; cardIndex < TRIAD_SIZE; cardIndex++) {
+                            mSlots.get(triadIndex)[cardIndex].clearHighlighting();
+                        }
+                    }
 					highlight(getResources().getColor(R.color.cursor));
-					mTrioIndex = x;
-					mIndexInTrio = y;
+					mTriadIndex = x;
+					mIndexInTriad = y;
+                    mHandFragmentHostActivity.onExitSolutionDisplayMode();
 				}
 			});
 		}
@@ -71,7 +72,7 @@ public class HandFragment extends Fragment {
             mView.invalidate();
         }
 
-		private void unhighlight() {
+		private void clearHighlighting() {
             mView.setBackgroundColor(Color.WHITE);
             mView.invalidate();
 		}
@@ -80,13 +81,19 @@ public class HandFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        trioSize = TRIAD_SIZE;
+        mHandFragmentHostActivity = (HandFragmentHostActivity)getActivity();
+        mSolutionFragmentHostActivity = (SolutionFragmentHostActivity)getActivity();
+        mSlots = new ArrayList<Slot[]>();
+        mInitCards = new ArrayList<Card>();
         if (savedInstanceState != null) {
-            numTrios = savedInstanceState.getInt(SAVED_TRIAD_COUNT);
-            mInitCards = (List<Card>) savedInstanceState.getSerializable(SAVED_CARDS_DISPLAYED);
+            mNumTriads = savedInstanceState.getInt(SAVED_TRIAD_COUNT);
+            @SuppressWarnings("unchecked")
+            List<Card> cards =
+                    (List<Card>)savedInstanceState.getSerializable(SAVED_CARDS_DISPLAYED);
+            mInitCards = cards;
         } else {
-            numTrios = DEFAULT_NUMBER_OF_TRIADS;
-            for (int i = 0; i < numTrios * trioSize; i++) {
+            mNumTriads = INITIAL_NUMBER_OF_TRIADS;
+            for (int i = 0; i < mNumTriads * TRIAD_SIZE; i++) {
                 mInitCards.add(Card.BLANK_CARD);
             }
         }
@@ -97,120 +104,118 @@ public class HandFragment extends Fragment {
     		Bundle savedInstanceState) {
     	super.onCreateView(inflater, parent, savedInstanceState);
     	View v = inflater.inflate(R.layout.fragment_hand, parent, false);
-        final LinearLayout trioHolderView = (LinearLayout) v.findViewById(R.id.trio_holder);
-        mTrioIndex = 0;
-        mIndexInTrio = 0;
-        initializeSlots(trioHolderView);
+        final LinearLayout triadHolderView = (LinearLayout) v.findViewById(R.id.triad_holder);
+        mTriadIndex = 0;
+        mIndexInTriad = 0;
+        initializeSlots(triadHolderView);
 
-        if (numTrios > 0) {
+        if (mNumTriads > 0) {
             mSlots.get(0)[0].highlight(getResources().getColor(R.color.cursor));
         }
 		Button matchButton = (Button) v.findViewById(R.id.match_button);
 		matchButton.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				solve();
+                mSolutionFragmentHostActivity.showNextSolution();
 			}
 		});
         Button newTriadButton = (Button) v.findViewById(R.id.new_triad_button);
         newTriadButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                onAddTriad(trioHolderView);
+                onAddTriad(triadHolderView);
             }
         });
         Button deleteTriadButton = (Button) v.findViewById(R.id.delete_triad_button);
         deleteTriadButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
-                onDeleteTriad(trioHolderView);
+                onDeleteTriad(triadHolderView);
             }
         });
         return v;
     }
 
-    private void initializeSlots(LinearLayout trioHolderView) {
-        for (int trioIndex = 0; trioIndex < numTrios; trioIndex++) {
+    private void initializeSlots(LinearLayout triadHolderView) {
+        for (int triadIndex = 0; triadIndex < mNumTriads; triadIndex++) {
             Slot[] slots = new Slot[TRIAD_SIZE];
-            LinearLayout trioView = new LinearLayout(getActivity());
-            trioView.setOrientation(LinearLayout.HORIZONTAL);
-            for (int indexInTrio = 0; indexInTrio < trioSize; indexInTrio++) {
-                slots[indexInTrio] = new Slot(trioIndex, indexInTrio);
-                trioView.addView(slots[indexInTrio].getView());
-                slots[indexInTrio].showCard(mInitCards.get(indexInTrio + trioIndex * trioSize));
+            LinearLayout triadview = new LinearLayout(getActivity());
+            triadview.setOrientation(LinearLayout.HORIZONTAL);
+            for (int indexInTriad = 0; indexInTriad < TRIAD_SIZE; indexInTriad++) {
+                slots[indexInTriad] = new Slot(triadIndex, indexInTriad);
+                triadview.addView(slots[indexInTriad].getView());
+                slots[indexInTriad].showCard(mInitCards.get(indexInTriad + triadIndex * TRIAD_SIZE));
             }
             mSlots.add(slots);
-            trioHolderView.addView(trioView);
+            triadHolderView.addView(triadview);
         }
     }
 
-    private void onAddTriad(LinearLayout trioHolderView) {
-        int trioIndex = numTrios;
-        numTrios++;
+    private void onAddTriad(LinearLayout triadHolderView) {
+        int triadIndex = mNumTriads;
+        mNumTriads++;
         Slot[] slots = new Slot[TRIAD_SIZE];
-        LinearLayout trioView = new LinearLayout(getActivity());
-        trioView.setOrientation(LinearLayout.HORIZONTAL);
-        for (int indexInTrio = 0; indexInTrio < trioSize; indexInTrio++) {
-            slots[indexInTrio] = new Slot(trioIndex, indexInTrio);
-            trioView.addView(slots[indexInTrio].getView());
-            slots[indexInTrio].showCard(Card.BLANK_CARD);
+        LinearLayout triadView = new LinearLayout(getActivity());
+        triadView.setOrientation(LinearLayout.HORIZONTAL);
+        for (int indexInTriad = 0; indexInTriad < TRIAD_SIZE; indexInTriad++) {
+            slots[indexInTriad] = new Slot(triadIndex, indexInTriad);
+            triadView.addView(slots[indexInTriad].getView());
+            slots[indexInTriad].showCard(Card.BLANK_CARD);
         }
         mSlots.add(slots);
-        trioHolderView.addView(trioView);
-        mSlots.get(this.mTrioIndex)[mIndexInTrio].unhighlight();
-        this.mTrioIndex = 0;
-        mIndexInTrio = 0;
+        triadHolderView.addView(triadView);
+        mSlots.get(this.mTriadIndex)[mIndexInTriad].clearHighlighting();
+        this.mTriadIndex = 0;
+        mIndexInTriad = 0;
         mSlots.get(0)[0].highlight(getResources().getColor(R.color.cursor));
+        mHandFragmentHostActivity.onExitSolutionDisplayMode();
     }
 
-    private void onDeleteTriad(LinearLayout trioHolderView) {
-        mSlots.get(mTrioIndex)[mIndexInTrio].unhighlight();
-        int trioIndex = mSlots.size() - 1;
-        if (trioIndex < 0) {
+    private void onDeleteTriad(LinearLayout triadHolderView) {
+        int triadIndex = mSlots.size() - 1;
+        if (triadIndex < 0) {
             return;
         }
-        Slot[] removed = mSlots.remove(trioIndex);
+        mSlots.get(mTriadIndex)[mIndexInTriad].clearHighlighting();
+        Slot[] removed = mSlots.remove(triadIndex);
         for (Slot slot : removed) {
-            getMainActivity().removeCardInPlay(slot.getCard());
+            mHandFragmentHostActivity.removeFromHand(slot.getCard());
         }
-        numTrios--;
+        mNumTriads--;
 
-        trioHolderView.removeViewAt(trioIndex + 1);
-        if (trioIndex >= 1) {
-            mTrioIndex = 0;
-            mIndexInTrio = 0;
+        triadHolderView.removeViewAt(triadIndex);
+        if (triadIndex >= 1) {
+            mTriadIndex = 0;
+            mIndexInTriad = 0;
             mSlots.get(0)[0].highlight(getResources().getColor(R.color.cursor));
         }
+        mHandFragmentHostActivity.onExitSolutionDisplayMode();
     }
 
-    public void setCardAtCursor(Card card) {
-        Slot slot = mSlots.get(mTrioIndex)[mIndexInTrio];
-        getMainActivity().removeCardInPlay(slot.getCard());
+    public Card swapCardAtCursor(Card card) {
+        Slot slot = mSlots.get(mTriadIndex)[mIndexInTriad];
+        Card oldCard = slot.getCard();
         slot.showCard(card);
-        getMainActivity().addCardInPlay(card);
         highlightNext();
+        return oldCard;
     }
 
     private void highlightNext() {
-        mSlots.get(mTrioIndex)[mIndexInTrio].unhighlight();
-        mTrioIndex += 1;
-        if (mTrioIndex >= numTrios) {
-            mTrioIndex = 0;
-            mIndexInTrio += 1;
+        mSlots.get(mTriadIndex)[mIndexInTriad].clearHighlighting();
+        mTriadIndex += 1;
+        if (mTriadIndex >= mNumTriads) {
+            mTriadIndex = 0;
+            mIndexInTriad += 1;
         }
-        if (mIndexInTrio >= trioSize) {
-            mIndexInTrio = 0;
+        if (mIndexInTriad >= TRIAD_SIZE) {
+            mIndexInTriad = 0;
         }
-        mSlots.get(mTrioIndex)[mIndexInTrio].highlight(getResources().getColor(R.color.cursor));
-    }
-
-    private MainActivity getMainActivity() {
-        return (MainActivity) getActivity();
+        mSlots.get(mTriadIndex)[mIndexInTriad].highlight(getResources().getColor(R.color.cursor));
     }
 
     @Override
     public void onSaveInstanceState(Bundle savedInstanceState) {
-        savedInstanceState.putInt(SAVED_TRIAD_COUNT, numTrios);
+        savedInstanceState.putInt(SAVED_TRIAD_COUNT, mNumTriads);
         List<Card> cardsDisplayed = new ArrayList<Card>();
         for (Slot[] slots : mSlots) {
             for (Slot slot : slots) {
@@ -220,58 +225,19 @@ public class HandFragment extends Fragment {
         savedInstanceState.putSerializable(SAVED_CARDS_DISPLAYED, (Serializable) cardsDisplayed);
     }
 
-    private void solve() {
-        List<Set<Card>> sets = findSets();
-        Set<Card> unified = new HashSet<Card>();
-        for (Set<Card> set: sets) {
-            unified.addAll(set);
-        }
-
+    void showSolution(Set<Card> solution) {
         int solutionColor = getResources().getColor(R.color.solution);
-        for (Set<Card> set : sets) {
-            for (int i = 0; i < (numTrios * trioSize); i++) {
-                int trioIndex = i % numTrios;
-                int indexInTrio = i / numTrios;
-                Slot slot = mSlots.get(trioIndex)[indexInTrio];
-                if (slot.getCard() == null || !unified.contains(slot.getCard())) {
-                    slot.unhighlight();
-                }
-                else if (set.contains(slot.getCard())) {
-                    slot.highlight(solutionColor);
-                }
+        for (int i = 0; i < (mNumTriads * TRIAD_SIZE); i++) {
+            int triadIndex = i % mNumTriads;
+            int indexInTriad = i / mNumTriads;
+            Slot slot = mSlots.get(triadIndex)[indexInTriad];
+            Card card = slot.getCard();
+            if (card == null || !solution.contains(card)) {
+                slot.clearHighlighting();
+            } else if (solution.contains(card)) {
+                slot.highlight(solutionColor);
             }
-            solutionColor += 0x00222222;
         }
-        Toast toast = Toast.makeText(getActivity(), "Num sets: " + sets.size(), Toast.LENGTH_SHORT);
-        toast.show();
     }
 
-    private List<Set<Card>> findSets() {
-        List<Set<Card>> result = new ArrayList<Set<Card>>();
-        for (int first = 0; first < (numTrios * trioSize); first++) {
-    		int firstTrioIndex = first % numTrios;
-    		int firstIndexInTrio = first / numTrios;
-            Card firstCard = mSlots.get(firstTrioIndex)[firstIndexInTrio].getCard();
-    		if ((firstCard == null) || firstCard.isBlank()) {
-    			continue;
-    		}
-    		for (int second = first + 1; second < (numTrios * trioSize); second++) {
-    			int secondTrioIndex = second % numTrios;
-    			int secondIndexInTrio = second / numTrios;
-                Card secondCard = mSlots.get(secondTrioIndex)[secondIndexInTrio].getCard();
-    			if ((secondCard == null) || secondCard.isBlank()) {
-    				continue;
-    			}
-                Card thirdCard = firstCard.getCompleter(secondCard);
-    			for (int third = second + 1; third < (numTrios * trioSize); third++) {
-    				int thirdTrioIndex = third % numTrios;
-    				int thirdIndexInTrio = third / numTrios;
-                    if (thirdCard.equals(mSlots.get(thirdTrioIndex)[thirdIndexInTrio].getCard())) {
-    					result.add(new HashSet<Card>(Arrays.asList(firstCard, secondCard, thirdCard)));
-    				}
-    			}
-    		}
-    	}
-        return  result;
-    }
 }

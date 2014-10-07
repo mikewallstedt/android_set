@@ -1,21 +1,19 @@
 package mwallstedt.set;
 
-import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
-import android.support.v4.app.Fragment;
 import android.util.SparseArray;
 import android.view.View;
 
-import java.util.List;
 import java.util.Set;
 
 public class CardPickerFragment extends DialogFragment {
 	public static final String EXTRA_VIEW_ID = "com.example.setsolver.view_id";
+
+    private CardPickerHostActivity mHostActivity;
 
     public static CardPickerFragment newInstance(int viewId) {
 		Bundle args = new Bundle();
@@ -41,6 +39,8 @@ public class CardPickerFragment extends DialogFragment {
     @NonNull
 	@Override
 	public Dialog onCreateDialog(Bundle savedInstanceState) {
+        super.onCreateDialog(savedInstanceState);
+        mHostActivity = (CardPickerHostActivity)getActivity();
         int viewId = getArguments().getInt(EXTRA_VIEW_ID);
 		View v = getActivity().getLayoutInflater()
 				.inflate(viewId, null);
@@ -147,11 +147,10 @@ public class CardPickerFragment extends DialogFragment {
 			break;
 		}
 
-        Set<Card> inPlay = ((MainActivity)getActivity()).getCardsInPlay();
         for (int i = 0; i < viewToCard.size(); i++) {
             int cardViewId = viewToCard.keyAt(i);
             Card card = viewToCard.get(cardViewId);
-            if (inPlay.contains(card)) {
+            if (mHostActivity.handContains(card)) {
                 v.findViewById(cardViewId).setAlpha(0);
             } else {
                 v.findViewById(cardViewId).setAlpha(1);

@@ -34,10 +34,6 @@ public class CardTemplatesFragment extends Fragment {
         public void onClick(View view) {
             FragmentManager fm = getActivity().getSupportFragmentManager();
             CardPickerFragment dialog = CardPickerFragment.newInstance(mLayoutId);
-            Fragment handFragment = fm.findFragmentById(R.id.handFragmentContainer);
-            if (handFragment != null) {
-                dialog.setTargetFragment(handFragment, PICK_CARD_CODE);
-            }
             dialog.show(fm, mDialogName);
         }
     }
@@ -53,8 +49,6 @@ public class CardTemplatesFragment extends Fragment {
             new Resources(R.id.s2, R.layout.dialog_s2, "s2"),
             new Resources(R.id.s3, R.layout.dialog_s3, "s3")
     };
-
-	public static final int PICK_CARD_CODE = 0;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup parent, Bundle savedInstanceState) {
