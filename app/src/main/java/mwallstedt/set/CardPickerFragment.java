@@ -8,10 +8,8 @@ import android.support.v4.app.DialogFragment;
 import android.util.SparseArray;
 import android.view.View;
 
-import java.util.Set;
-
 public class CardPickerFragment extends DialogFragment {
-	public static final String EXTRA_VIEW_ID = "com.example.setsolver.view_id";
+	public static final String EXTRA_VIEW_ID = "mwallstedt.set.view_id";
 
     private CardPickerHostActivity mHostActivity;
 
@@ -30,7 +28,7 @@ public class CardPickerFragment extends DialogFragment {
 		cardView.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-                ((MainActivity)getActivity()).onCardChosen(card);
+                mHostActivity.onCardChosen(card);
 				dismiss();
 			}
 		});
@@ -160,8 +158,6 @@ public class CardPickerFragment extends DialogFragment {
 
         return new AlertDialog.Builder(getActivity())
 			.setView(v)
-			//.setTitle(R.string.card_picker_title)
-			//.setPositiveButton(android.R.string.ok, null)
 			.create();
 	}
 

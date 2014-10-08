@@ -139,15 +139,15 @@ public class HandFragment extends Fragment {
     private void initializeSlots(LinearLayout triadHolderView) {
         for (int triadIndex = 0; triadIndex < mNumTriads; triadIndex++) {
             Slot[] slots = new Slot[TRIAD_SIZE];
-            LinearLayout triadview = new LinearLayout(getActivity());
-            triadview.setOrientation(LinearLayout.HORIZONTAL);
+            LinearLayout triadView = new LinearLayout(getActivity());
+            triadView.setOrientation(LinearLayout.HORIZONTAL);
             for (int indexInTriad = 0; indexInTriad < TRIAD_SIZE; indexInTriad++) {
                 slots[indexInTriad] = new Slot(triadIndex, indexInTriad);
-                triadview.addView(slots[indexInTriad].getView());
+                triadView.addView(slots[indexInTriad].getView());
                 slots[indexInTriad].showCard(mInitCards.get(indexInTriad + triadIndex * TRIAD_SIZE));
             }
             mSlots.add(slots);
-            triadHolderView.addView(triadview);
+            triadHolderView.addView(triadView);
         }
     }
 
