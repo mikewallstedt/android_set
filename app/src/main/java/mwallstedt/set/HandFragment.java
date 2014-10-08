@@ -40,11 +40,7 @@ public class HandFragment extends Fragment {
 			mView.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
-                    for (int triadIndex = 0; triadIndex < mNumTriads; triadIndex++) {
-                        for (int cardIndex = 0; cardIndex < TRIAD_SIZE; cardIndex++) {
-                            mSlots.get(triadIndex)[cardIndex].clearHighlighting();
-                        }
-                    }
+                    clearHighlighting();
 					highlight(getResources().getColor(R.color.cursor));
 					mTriadIndex = x;
 					mIndexInTriad = y;
@@ -152,6 +148,8 @@ public class HandFragment extends Fragment {
     }
 
     private void onAddTriad(LinearLayout triadHolderView) {
+        clearAllHighlighting();
+        mHandFragmentHostActivity.onExitSolutionDisplayMode();
         int triadIndex = mNumTriads;
         mNumTriads++;
         Slot[] slots = new Slot[TRIAD_SIZE];
@@ -172,6 +170,8 @@ public class HandFragment extends Fragment {
     }
 
     private void onDeleteTriad(LinearLayout triadHolderView) {
+        clearAllHighlighting();
+        mHandFragmentHostActivity.onExitSolutionDisplayMode();
         int triadIndex = mSlots.size() - 1;
         if (triadIndex < 0) {
             return;
@@ -236,6 +236,14 @@ public class HandFragment extends Fragment {
                 slot.clearHighlighting();
             } else if (solution.contains(card)) {
                 slot.highlight(solutionColor);
+            }
+        }
+    }
+
+    private void clearAllHighlighting() {
+        for (int triadIndex = 0; triadIndex < mNumTriads; triadIndex++) {
+            for (int cardIndex = 0; cardIndex < TRIAD_SIZE; cardIndex++) {
+                mSlots.get(triadIndex)[cardIndex].clearHighlighting();
             }
         }
     }
