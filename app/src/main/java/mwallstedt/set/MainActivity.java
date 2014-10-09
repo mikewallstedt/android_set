@@ -31,6 +31,8 @@ public class MainActivity extends FragmentActivity
 
     private List<Set<Card>> mSolutions;
 
+    private Toast mSolutionToast;
+
     @Override
     public boolean handContains(Card card) {
         return mHand.contains(card);
@@ -64,8 +66,8 @@ public class MainActivity extends FragmentActivity
         if (!mSolutions.isEmpty()) {
             toastMessage = "Showing solution " + (mSolutionIndex + 1) + " of " + mSolutions.size();
         }
-        Toast toast = Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT);
-        toast.show();
+        mSolutionToast.setText(toastMessage);
+        mSolutionToast.show();
         if (mSolutions.isEmpty()) {
             mSolutionDisplayMode = false;
             return;
@@ -79,6 +81,8 @@ public class MainActivity extends FragmentActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mSolutionToast = Toast.makeText(this, "", Toast.LENGTH_SHORT);
         
         if (savedInstanceState != null) {
             @SuppressWarnings("unchecked")
