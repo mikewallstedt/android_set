@@ -40,7 +40,7 @@ public class HandFragment extends Fragment {
 			mView.setOnClickListener(new OnClickListener() {
 				@Override
 				public void onClick(View arg0) {
-                    clearHighlighting();
+                    clearAllHighlighting();
 					highlight(getResources().getColor(R.color.cursor));
 					mTriadIndex = x;
 					mIndexInTriad = y;
