@@ -57,18 +57,22 @@ public class MainActivity extends FragmentActivity
     public void showNextSolution() {
         if (!mSolutionDisplayMode) {
             mSolutions = mHand.findSets();
-            mSolutionIndex = -1;
+            mSolutionIndex = 0;
             mSolutionDisplayMode = true;
         }
-        String toastMessage = "Number of solutions = " + mSolutions.size();
+        String toastMessage = "No solutions";
+        if (!mSolutions.isEmpty()) {
+            toastMessage = "Showing solution " + (mSolutionIndex + 1) + " of " + mSolutions.size();
+        }
         Toast toast = Toast.makeText(this, toastMessage, Toast.LENGTH_SHORT);
         toast.show();
         if (mSolutions.isEmpty()) {
+            mSolutionDisplayMode = false;
             return;
         }
+        mHandFragment.showSolution(mSolutions.get(mSolutionIndex));
         mSolutionIndex++;
         mSolutionIndex %= mSolutions.size();
-        mHandFragment.showSolution(mSolutions.get(mSolutionIndex));
     }
 
     @Override
