@@ -1,5 +1,6 @@
 package mwallstedt.set;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
@@ -77,6 +78,7 @@ public class MainActivity extends FragmentActivity
         mSolutionIndex %= mSolutions.size();
     }
 
+    @SuppressLint("ShowToast")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
