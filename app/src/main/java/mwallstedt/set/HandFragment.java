@@ -189,6 +189,11 @@ public class HandFragment extends Fragment {
         mNumTriads++;
         Slot[] slots = new Slot[TRIAD_SIZE];
         LinearLayout triadView = new LinearLayout(getActivity());
+        LinearLayout.LayoutParams layoutParams =
+                new LinearLayout.LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        layoutParams.gravity = Gravity.CENTER;
+        triadView.setLayoutParams(layoutParams);
         triadView.setOrientation(LinearLayout.HORIZONTAL);
         for (int indexInTriad = 0; indexInTriad < TRIAD_SIZE; indexInTriad++) {
             slots[indexInTriad] = new Slot(triadIndex, indexInTriad);
