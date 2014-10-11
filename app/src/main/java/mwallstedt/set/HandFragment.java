@@ -34,8 +34,10 @@ public class HandFragment extends Fragment {
     private class Slot {
 		private final ImageView mView;
         private Card mCard;
+        private boolean mIsHighlighted;
 
 		private Slot(final int x, final int y) {
+            mIsHighlighted = false;
 			mView = new ImageView(getActivity());
 			mView.setOnClickListener(new OnClickListener() {
 				@Override
@@ -53,10 +55,15 @@ public class HandFragment extends Fragment {
             return mCard;
         }
 
+        private boolean isHighlighted() {
+            return mIsHighlighted;
+        }
+
 		private void showCard(Card card) {
 			mCard = card;
     		Drawable drawable = getActivity().getResources().getDrawable(card.getDrawableId());
     		mView.setImageDrawable(drawable);
+            clearHighlighting();
 		}
 
         private ImageView getView() {
@@ -64,13 +71,17 @@ public class HandFragment extends Fragment {
         }
 
         private void highlight(int color) {
+            mIsHighlighted = true;
             mView.setBackgroundColor(color);
             mView.invalidate();
         }
 
 		private void clearHighlighting() {
-            mView.setBackgroundColor(Color.WHITE);
-            mView.invalidate();
+            if (mIsHighlighted) {
+                mIsHighlighted = false;
+                mView.setBackgroundColor(Color.WHITE);
+                mView.invalidate();
+            }
 		}
 	}
 
@@ -127,6 +138,24 @@ public class HandFragment extends Fragment {
             @Override
             public void onClick(View view) {
                 onDeleteTriad(triadHolderView);
+            }
+        });
+        Button removeButton = (Button) v.findViewById(R.id.remove_button);
+        removeButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for (Slot[] triad : mSlots) {
+                    for (Slot slot : triad) {
+                        if (slot.isHighlighted()) {
+                            Card card = slot.getCard();
+                            mHandFragmentHostActivity.removeFromHand(card);
+                            slot.showCard(Card.BLANK_CARD);
+                        }
+                    }
+                }
+                mSlots.get(mTriadIndex)[mIndexInTriad].highlight(
+                        getResources().getColor(R.color.cursor));
+                mHandFragmentHostActivity.onExitSolutionDisplayMode();
             }
         });
         return v;
