@@ -4,6 +4,7 @@ import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -165,6 +166,11 @@ public class HandFragment extends Fragment {
         for (int triadIndex = 0; triadIndex < mNumTriads; triadIndex++) {
             Slot[] slots = new Slot[TRIAD_SIZE];
             LinearLayout triadView = new LinearLayout(getActivity());
+            LinearLayout.LayoutParams layoutParams =
+                    new LinearLayout.LayoutParams(
+                            ViewGroup.LayoutParams.WRAP_CONTENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+            layoutParams.gravity = Gravity.CENTER;
+            triadView.setLayoutParams(layoutParams);
             triadView.setOrientation(LinearLayout.HORIZONTAL);
             for (int indexInTriad = 0; indexInTriad < TRIAD_SIZE; indexInTriad++) {
                 slots[indexInTriad] = new Slot(triadIndex, indexInTriad);
